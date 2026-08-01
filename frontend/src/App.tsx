@@ -1,22 +1,35 @@
-import { Suspense } from 'react';
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@/context';
-import { ErrorBoundary } from '@/components/common';
-import { Loading } from '@/components/common';
+import { ErrorBoundary, Loading } from '@/components/common';
 import { ROUTES } from '@/utils/constants';
-import { LandingPage } from '@/pages/Landing';
-import { DashboardPage } from '@/pages/Dashboard';
-import { DetectionPage } from '@/pages/Detection';
-import { HistoryPage } from '@/pages/History';
-import { AboutPage } from '@/pages/About';
-import { NotFoundPage } from '@/pages/NotFound';
+
+// Lazy-loaded routes for performance code-splitting
+const LandingPage = lazy(() =>
+  import('@/pages/Landing').then((m) => ({ default: m.LandingPage }))
+);
+const DashboardPage = lazy(() =>
+  import('@/pages/Dashboard').then((m) => ({ default: m.DashboardPage }))
+);
+const DetectionPage = lazy(() =>
+  import('@/pages/Detection').then((m) => ({ default: m.DetectionPage }))
+);
+const HistoryPage = lazy(() =>
+  import('@/pages/History').then((m) => ({ default: m.HistoryPage }))
+);
+const AboutPage = lazy(() =>
+  import('@/pages/About').then((m) => ({ default: m.AboutPage }))
+);
+const NotFoundPage = lazy(() =>
+  import('@/pages/NotFound').then((m) => ({ default: m.NotFoundPage }))
+);
 
 export function App() {
   return (
     <ThemeProvider>
       <ErrorBoundary>
         <BrowserRouter>
-          <Suspense fallback={<Loading fullScreen message="Loading application..." />}>
+          <Suspense fallback={<Loading fullScreen message="Loading CropGuard AI..." />}>
             <Routes>
               <Route path={ROUTES.LANDING} element={<LandingPage />} />
               <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />

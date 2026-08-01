@@ -16,38 +16,40 @@
 
   html {
     scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
-    @apply bg-surface text-slate-100 font-sans;
+    @apply bg-surface text-slate-100 font-sans antialiased selection:bg-primary-500/30 selection:text-primary-300;
     min-height: 100vh;
   }
 
+  /* High contrast accessible scrollbar */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    @apply bg-surface;
+    @apply bg-slate-950;
   }
 
   ::-webkit-scrollbar-thumb {
-    @apply bg-surface-100 rounded-full;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-surface-200;
+    @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
   }
 }
 
 @layer components {
   .glass {
-    @apply bg-white/5 backdrop-blur-md border border-white/10;
+    @apply bg-slate-900/60 backdrop-blur-md border border-white/10;
   }
 
   .glass-card {
-    @apply glass rounded-2xl shadow-glass;
+    @apply glass rounded-2xl shadow-glass transition-all duration-200;
+  }
+
+  .glass-card-interactive {
+    @apply glass-card hover:border-primary-500/30 hover:shadow-glow hover:-translate-y-0.5 active:translate-y-0;
   }
 
   .gradient-text {
@@ -59,15 +61,19 @@
   }
 
   .page-header {
-    @apply mb-8;
+    @apply mb-6 sm:mb-8;
   }
 
   .page-title {
-    @apply text-2xl sm:text-3xl font-bold text-white tracking-tight;
+    @apply text-2xl sm:text-3xl font-extrabold text-white tracking-tight;
   }
 
   .page-subtitle {
-    @apply mt-2 text-slate-400 text-sm sm:text-base;
+    @apply mt-1.5 text-slate-300 text-sm sm:text-base leading-relaxed;
+  }
+
+  .focus-ring {
+    @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950;
   }
 }
 
@@ -76,7 +82,7 @@
     background: linear-gradient(
       90deg,
       rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.05) 50%,
+      rgba(255, 255, 255, 0.08) 50%,
       rgba(255, 255, 255, 0) 100%
     );
     background-size: 200% 100%;

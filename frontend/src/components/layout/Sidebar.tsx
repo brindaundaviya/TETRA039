@@ -58,33 +58,47 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
     <>
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-slate-950/70 backdrop-blur-sm lg:hidden transition-opacity animate-fade-in"
           onClick={onClose}
           aria-hidden="true"
         />
       )}
 
       <aside
+        aria-label="Sidebar navigation"
         className={cn(
-          'fixed top-0 left-0 z-50 h-full w-64 glass border-r border-white/5',
-          'flex flex-col transition-transform duration-300 ease-in-out',
+          'fixed top-0 left-0 z-50 h-full w-64 bg-slate-900/95 border-r border-white/10 backdrop-blur-xl',
+          'flex flex-col transition-transform duration-300 ease-out shadow-2xl',
           'lg:translate-x-0 lg:static lg:z-auto',
           isOpen ? 'translate-x-0' : '-translate-x-full',
         )}
       >
-        <div className="flex items-center gap-3 px-6 py-5 border-b border-white/5">
-          <div className="w-9 h-9 rounded-xl bg-gradient-primary flex items-center justify-center shadow-glow">
-            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+        <div className="flex items-center justify-between px-6 py-5 border-b border-white/10">
+          <NavLink to={ROUTES.LANDING} className="flex items-center gap-3 focus-ring rounded-xl">
+            <div className="w-9 h-9 rounded-xl bg-gradient-primary flex items-center justify-center shadow-glow">
+              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+              </svg>
+            </div>
+            <div>
+              <h1 className="text-base font-extrabold text-white tracking-tight">{APP_NAME}</h1>
+              <p className="text-[11px] font-mono text-slate-400">AI Vision System</p>
+            </div>
+          </NavLink>
+
+          <button
+            type="button"
+            onClick={onClose}
+            className="lg:hidden text-slate-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10 focus-ring"
+            aria-label="Close sidebar navigation"
+          >
+            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
-          </div>
-          <div>
-            <h1 className="text-base font-bold text-white">{APP_NAME}</h1>
-            <p className="text-xs text-slate-500">Disease Detection</p>
-          </div>
+          </button>
         </div>
 
-        <nav className="flex-1 px-3 py-4 space-y-1">
+        <nav className="flex-1 px-3 py-4 space-y-1" aria-label="Main Navigation">
           {navItems.map((item) => (
             <NavLink
               key={item.path}
@@ -92,23 +106,29 @@ export function Sidebar({ isOpen, onClose }: SidebarProps) {
               onClick={onClose}
               className={({ isActive }) =>
                 cn(
-                  'flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200',
+                  'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 focus-ring',
                   isActive
-                    ? 'bg-primary-500/10 text-primary-400 border border-primary-500/20'
-                    : 'text-slate-400 hover:text-white hover:bg-white/5',
+                    ? 'bg-primary-500/15 text-primary-400 border border-primary-500/30 shadow-glow'
+                    : 'text-slate-300 hover:text-white hover:bg-white/5',
                 )
               }
             >
-              {item.icon}
-              {item.label}
+              {({ isActive }) => (
+                <>
+                  <span className={isActive ? 'text-primary-400' : 'text-slate-400'}>
+                    {item.icon}
+                  </span>
+                  {item.label}
+                </>
+              )}
             </NavLink>
           ))}
         </nav>
 
-        <div className="px-4 py-4 border-t border-white/5">
-          <div className="glass rounded-xl p-3">
-            <p className="text-xs text-slate-400">Team TETRA039</p>
-            <p className="text-xs text-primary-400 font-medium mt-0.5">Tetrathon 2026</p>
+        <div className="px-4 py-4 border-t border-white/10">
+          <div className="rounded-xl bg-white/5 border border-white/5 p-3 space-y-0.5">
+            <p className="text-xs font-semibold text-slate-300">Team TETRA039</p>
+            <p className="text-[11px] font-mono text-primary-400">National Tetrathon 2026</p>
           </div>
         </div>
       </aside>
