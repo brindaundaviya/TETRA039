@@ -6,7 +6,10 @@ import { sendError } from '../utils/response.js';
 
 export function notFoundHandler(req: Request, res: Response): void {
   const message = `Route not found: ${req.method} ${req.originalUrl}`;
-  sendError(res, message, 404, 'NOT_FOUND');
+  sendError(res, message, 404, {
+    code: 'NOT_FOUND',
+    details: `The requested endpoint '${req.originalUrl}' does not exist on this server`,
+  });
 }
 
 export function errorHandler(
@@ -17,8 +20,10 @@ export function errorHandler(
 ): void {
   const statusCode = err.statusCode && Number.isInteger(err.statusCode) ? err.statusCode : 500;
   const message = err.message || 'Internal server error';
+  const errorCode = err.code || (statusCode >= 500 ? 'INTERNAL_SERVER_ERROR' : 'BAD_REQUEST');
 
-  logger.error(`[${req.method}] ${req.originalUrl} - ${statusCode} - ${message}`, {
+  logger.error(`[${req.id || 'NO_ID'}] ${req.method} ${req.originalUrl} - ${statusCode} - ${message}`, {
+    requestId: req.id,
     statusCode,
     path: req.originalUrl,
     method: req.method,
@@ -29,7 +34,10 @@ export function errorHandler(
     res,
     message,
     statusCode,
-    statusCode >= 500 ? 'INTERNAL_SERVER_ERROR' : message,
+    {
+      code: errorCode,
+      details: err.details || message,
+    },
     env.isDevelopment ? err.stack : undefined
   );
 }

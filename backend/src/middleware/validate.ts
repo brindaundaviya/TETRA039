@@ -5,6 +5,15 @@ export type ValidationRule = (req: Request) => string | null;
 
 export function validateRequest(rules: ValidationRule[]) {
   return (req: Request, _res: Response, next: NextFunction): void => {
+    // Sanitize body fields if string
+    if (req.body && typeof req.body === 'object') {
+      for (const key of Object.keys(req.body)) {
+        if (typeof req.body[key] === 'string') {
+          req.body[key] = req.body[key].trim();
+        }
+      }
+    }
+
     for (const rule of rules) {
       const error = rule(req);
       if (error) {
@@ -17,8 +26,13 @@ export function validateRequest(rules: ValidationRule[]) {
 
 export const commonRules = {
   requireBodyField: (field: string) => (req: Request): string | null => {
-    if (!req.body || req.body[field] === undefined || req.body[field] === null || req.body[field] === '') {
-      return `Field '${field}' is required in request body`;
+    if (
+      !req.body ||
+      req.body[field] === undefined ||
+      req.body[field] === null ||
+      (typeof req.body[field] === 'string' && req.body[field].trim() === '')
+    ) {
+      return `Field '${field}' is required and cannot be empty`;
     }
     return null;
   },
@@ -28,7 +42,10 @@ export const commonRules = {
       return `Request body is missing. One of [${fields.join(', ')}] is required`;
     }
     const hasAtLeastOne = fields.some(
-      (field) => req.body[field] !== undefined && req.body[field] !== null && req.body[field] !== ''
+      (field) =>
+        req.body[field] !== undefined &&
+        req.body[field] !== null &&
+        (typeof req.body[field] !== 'string' || req.body[field].trim() !== '')
     );
     if (!hasAtLeastOne) {
       return `At least one of [${fields.join(', ')}] is required in request body`;

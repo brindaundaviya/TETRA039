@@ -1,5 +1,5 @@
 import type { Response } from 'express';
-import type { ApiResponse } from '../types/index.js';
+import type { ApiErrorDetails, ApiResponse } from '../types/index.js';
 
 export function sendSuccess<T>(
   res: Response,
@@ -11,6 +11,7 @@ export function sendSuccess<T>(
     success: true,
     message,
     data,
+    requestId: res.req?.id,
   };
   return res.status(statusCode).json(responsePayload);
 }
@@ -27,14 +28,42 @@ export function sendError(
   res: Response,
   message: string,
   statusCode = 500,
-  errorDetails?: string | null,
+  errorDetails?: ApiErrorDetails | string | null,
   stack?: string
 ): Response {
+  let formattedError: ApiErrorDetails | string;
+
+  if (typeof errorDetails === 'object' && errorDetails !== null) {
+    formattedError = errorDetails;
+  } else {
+    const defaultCode =
+      statusCode === 404
+        ? 'NOT_FOUND'
+        : statusCode === 400
+        ? 'BAD_REQUEST'
+        : statusCode === 401
+        ? 'UNAUTHORIZED'
+        : statusCode === 403
+        ? 'FORBIDDEN'
+        : statusCode === 504
+        ? 'GATEWAY_TIMEOUT'
+        : statusCode === 503
+        ? 'SERVICE_UNAVAILABLE'
+        : 'INTERNAL_ERROR';
+
+    formattedError = {
+      code: defaultCode,
+      details: typeof errorDetails === 'string' ? errorDetails : message,
+    };
+  }
+
   const responsePayload: ApiResponse = {
     success: false,
     message,
-    error: errorDetails ?? message,
+    error: formattedError,
+    requestId: res.req?.id,
     ...(stack ? { stack } : {}),
   };
+
   return res.status(statusCode).json(responsePayload);
 }

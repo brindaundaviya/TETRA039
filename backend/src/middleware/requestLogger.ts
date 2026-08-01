@@ -10,6 +10,7 @@ export function requestLogger(req: Request, res: Response, next: NextFunction): 
     const statusCode = res.statusCode;
 
     const logMeta = {
+      requestId: req.id,
       method,
       path: originalUrl,
       status: statusCode,
@@ -18,11 +19,11 @@ export function requestLogger(req: Request, res: Response, next: NextFunction): 
     };
 
     if (statusCode >= 500) {
-      logger.error(`HTTP ${method} ${originalUrl} ${statusCode} - ${duration}ms`, logMeta);
+      logger.error(`[${req.id}] HTTP ${method} ${originalUrl} ${statusCode} - ${duration}ms`, logMeta);
     } else if (statusCode >= 400) {
-      logger.warn(`HTTP ${method} ${originalUrl} ${statusCode} - ${duration}ms`, logMeta);
+      logger.warn(`[${req.id}] HTTP ${method} ${originalUrl} ${statusCode} - ${duration}ms`, logMeta);
     } else {
-      logger.info(`HTTP ${method} ${originalUrl} ${statusCode} - ${duration}ms`, logMeta);
+      logger.info(`[${req.id}] HTTP ${method} ${originalUrl} ${statusCode} - ${duration}ms`, logMeta);
     }
   });
 

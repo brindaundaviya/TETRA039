@@ -1,8 +1,15 @@
+export interface ApiErrorDetails {
+  code: string;
+  details?: unknown;
+  field?: string;
+}
+
 export interface ApiResponse<T = unknown> {
   success: boolean;
   message: string;
   data?: T;
-  error?: string | null;
+  error?: ApiErrorDetails | string | null;
+  requestId?: string;
   stack?: string;
 }
 
@@ -21,6 +28,8 @@ export interface HealthCheckResponse {
 export interface AppError extends Error {
   statusCode?: number;
   isOperational?: boolean;
+  code?: string;
+  details?: unknown;
 }
 
 // Domain Model Interfaces
@@ -112,6 +121,7 @@ export interface ImageUploadMetadata {
 declare global {
   namespace Express {
     interface Request {
+      id?: string;
       file?: UploadedFile;
     }
   }
