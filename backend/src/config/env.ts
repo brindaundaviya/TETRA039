@@ -2,18 +2,34 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-function requireEnv(key: string, fallback?: string): string {
+function getEnv(key: string, fallback?: string): string {
   const value = process.env[key] ?? fallback;
-  if (value === undefined) {
-    throw new Error(`Missing required environment variable: ${key}`);
+  if (value === undefined || value === '') {
+    throw new Error(`[Configuration Error] Missing required environment variable: ${key}`);
   }
   return value;
 }
 
+function getEnvNumber(key: string, fallback: number): number {
+  const rawValue = process.env[key];
+  if (!rawValue) return fallback;
+  const parsed = parseInt(rawValue, 10);
+  if (isNaN(parsed) || parsed <= 0) {
+    throw new Error(`[Configuration Error] Environment variable ${key} must be a positive integer`);
+  }
+  return parsed;
+}
+
+const nodeEnv = getEnv('NODE_ENV', 'development');
+
 export const env = {
-  port: parseInt(requireEnv('PORT', '5000'), 10),
-  nodeEnv: requireEnv('NODE_ENV', 'development'),
-  corsOrigin: requireEnv('CORS_ORIGIN', 'http://localhost:5173'),
-  isDevelopment: (process.env.NODE_ENV ?? 'development') === 'development',
-  isProduction: process.env.NODE_ENV === 'production',
+  port: getEnvNumber('PORT', 5000),
+  nodeEnv,
+  corsOrigin: getEnv('CORS_ORIGIN', 'http://localhost:5173'),
+  apiVersion: getEnv('API_VERSION', 'v1'),
+  isDevelopment: nodeEnv === 'development',
+  isProduction: nodeEnv === 'production',
+  isTest: nodeEnv === 'test',
 } as const;
+
+export type Env = typeof env;

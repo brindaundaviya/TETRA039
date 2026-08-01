@@ -1,12 +1,12 @@
 import { env } from '../config/env.js';
 
-type LogLevel = 'info' | 'warn' | 'error' | 'debug';
+export type LogLevel = 'info' | 'warn' | 'error' | 'debug';
 
 const LOG_COLORS: Record<LogLevel, string> = {
-  info: '\x1b[36m',
-  warn: '\x1b[33m',
-  error: '\x1b[31m',
-  debug: '\x1b[35m',
+  info: '\x1b[36m',  // Cyan
+  warn: '\x1b[33m',  // Yellow
+  error: '\x1b[31m', // Red
+  debug: '\x1b[35m', // Magenta
 };
 
 const RESET = '\x1b[0m';
