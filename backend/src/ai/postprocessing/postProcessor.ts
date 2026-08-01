@@ -43,19 +43,20 @@ export class AiPostProcessor {
     const primaryProb = classProbabilities[topIdx] ?? 0;
     const primaryMeta = getDiseaseClassInfo(topIdx);
 
-    // Pipeline Step 4: Extract and format top predictions array (Top 3)
+    // Pipeline Step 4: Extract and format top predictions array (Top 3), strictly clamped [0..100]%
     const topPredictions: TopPredictionItem[] = topIndices.map((idx) => {
       const prob = classProbabilities[idx] ?? 0;
       const meta = getDiseaseClassInfo(idx);
+      const clampedPct = Math.min(100.0, Math.max(0.0, toPercentage(prob, 1)));
 
       return {
         label: meta.disease,
         name: meta.disease,
-        confidence: toPercentage(prob, 1),
+        confidence: clampedPct,
       };
     });
 
-    const primaryConfidencePercentage = toPercentage(primaryProb, 1);
+    const primaryConfidencePercentage = Math.min(100.0, Math.max(0.0, toPercentage(primaryProb, 1)));
 
     // Pipeline Step 5: Calculate confidence category (Very High, High, Moderate, Low)
     const confidenceCategory = this.evaluateConfidenceCategory(primaryConfidencePercentage);
@@ -63,7 +64,7 @@ export class AiPostProcessor {
     // Pipeline Step 6: Assign risk level from configurable risk mapping
     const risk = getDiseaseRiskLevel(primaryMeta.disease);
 
-    // Pipeline Step 7: Format processing time string (e.g. "1.2 sec")
+    // Pipeline Step 7: Format processing time string (e.g. "1.2 sec" or "0.05 sec")
     const seconds = processingTimeMs / 1000;
     const formattedProcessingTime = seconds >= 0.1 ? `${seconds.toFixed(1)} sec` : `${seconds.toFixed(2)} sec`;
 

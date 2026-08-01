@@ -21,25 +21,33 @@ export class PlantVillageModelLoader implements IModelLoader<ModelLayerWeights> 
   }
 
   /**
-   * Thread-safe model loader ensuring the model is loaded ONCE and reused across all requests.
+   * Thread-safe double-checked lock singleton model loader.
+   * Guarantees model is initialized EXACTLY ONCE and reused for all subsequent inferences.
    */
   public async loadModel(): Promise<ModelLayerWeights> {
-    // 1. Return cached model instance immediately if already loaded
+    // 1. Fast path: Return cached instance immediately if already loaded
     if (this.isModelLoaded && this.modelInstance) {
       return this.modelInstance;
     }
 
-    // 2. Prevent race conditions: return in-flight loading promise if initialization is in progress
+    // 2. Synchronization lock: Return existing load promise if initialization is in progress
     if (this.isInitializing && this.loadPromise) {
       return this.loadPromise;
     }
 
-    // 3. Initiate single model loading sequence
+    // 3. Initiate single-instance load pass with automatic error recovery
     this.isInitializing = true;
     this.loadPromise = (async () => {
       try {
-        // Simulate async weight loading / model file reading
-        await new Promise((resolve) => setTimeout(resolve, 20));
+        // Fast-path initialization check
+        if (this.modelInstance) {
+          this.isModelLoaded = true;
+          this.isInitializing = false;
+          return this.modelInstance;
+        }
+
+        // Simulate async weight load / model file reading
+        await new Promise((resolve) => setTimeout(resolve, 5));
 
         this.modelInstance = PRETRAINED_MODEL_WEIGHTS;
         this.isModelLoaded = true;
@@ -51,8 +59,10 @@ export class PlantVillageModelLoader implements IModelLoader<ModelLayerWeights> 
 
         return this.modelInstance;
       } catch (err) {
+        // Reset initialization locks to allow graceful retry recovery
         this.isInitializing = false;
         this.loadPromise = null;
+        this.isModelLoaded = false;
         const message = err instanceof Error ? err.message : String(err);
         throw new ModelLoadError(message);
       }

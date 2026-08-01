@@ -12,6 +12,7 @@ import { getTopKIndices, softmax } from '../utils/mathUtils.js';
 
 export class PlantVillageInferenceEngine implements IInferenceEngine {
   private readonly modelLoader: IModelLoader<ModelLayerWeights>;
+  private cachedFeatureVector: Float32Array | null = null;
 
   constructor(modelLoader: IModelLoader<ModelLayerWeights> = defaultModelLoader) {
     this.modelLoader = modelLoader;
@@ -19,6 +20,7 @@ export class PlantVillageInferenceEngine implements IInferenceEngine {
 
   /**
    * Execute neural model forward pass prediction on preprocessed image tensor data.
+   * High-performance cache-friendly loop execution.
    */
   public async predict(tensor: PreprocessedTensorData): Promise<RawPredictionOutput> {
     const startTime = performance.now();
@@ -28,16 +30,18 @@ export class PlantVillageInferenceEngine implements IInferenceEngine {
       const model = await this.modelLoader.loadModel();
 
       // 2. Extract feature representation vector from spatial RGB tensor
-      const features = this.extractLeafFeatures(tensor, model.featureDimension);
+      const features = this.extractLeafFeaturesFast(tensor, model.featureDimension);
 
       // 3. Forward pass: compute linear class logit scores (Wx + b)
-      const logits: number[] = new Array(model.numClasses);
+      const numClasses = model.numClasses;
+      const logits: number[] = new Array(numClasses);
+      const { classWeights, classBiases, featureDimension } = model;
 
-      for (let c = 0; c < model.numClasses; c++) {
-        let logit = model.classBiases[c] ?? 0;
-        const weightRow = model.classWeights[c];
+      for (let c = 0; c < numClasses; c++) {
+        let logit = classBiases[c] ?? 0;
+        const weightRow = classWeights[c];
         if (weightRow) {
-          for (let f = 0; f < model.featureDimension; f++) {
+          for (let f = 0; f < featureDimension; f++) {
             logit += (features[f] ?? 0) * (weightRow[f] ?? 0);
           }
         }
@@ -51,7 +55,7 @@ export class PlantVillageInferenceEngine implements IInferenceEngine {
       const topIndices = getTopKIndices(classProbabilities, AI_CONFIG.defaultTopK);
 
       const endTime = performance.now();
-      const processingTimeMs = Math.max(0.1, Math.round((endTime - startTime) * 10) / 10);
+      const processingTimeMs = Math.max(0.01, Math.round((endTime - startTime) * 100) / 100);
 
       return {
         classProbabilities,
@@ -66,19 +70,26 @@ export class PlantVillageInferenceEngine implements IInferenceEngine {
   }
 
   /**
-   * Extract 32-dimensional spatial visual feature vector from preprocessed leaf tensor.
+   * Fast spatial visual feature vector extraction with zero GC allocations.
    */
-  private extractLeafFeatures(tensor: PreprocessedTensorData, featureDim: number): Float32Array {
-    const features = new Float32Array(featureDim);
+  private extractLeafFeaturesFast(tensor: PreprocessedTensorData, featureDim: number): Float32Array {
+    if (!this.cachedFeatureVector || this.cachedFeatureVector.length !== featureDim) {
+      this.cachedFeatureVector = new Float32Array(featureDim);
+    }
+
+    const features = this.cachedFeatureVector;
+    features.fill(0);
+
     const data = tensor.data;
     const numPixels = tensor.width * tensor.height;
+    const len = data.length;
 
     let sumR = 0, sumG = 0, sumB = 0;
     let brownSpotPixels = 0;
     let yellowMarginPixels = 0;
     let darkLesionPixels = 0;
 
-    for (let i = 0; i < data.length; i += 3) {
+    for (let i = 0; i < len; i += 3) {
       const r = data[i] ?? 0;
       const g = data[i + 1] ?? 0;
       const b = data[i + 2] ?? 0;
@@ -101,19 +112,15 @@ export class PlantVillageInferenceEngine implements IInferenceEngine {
       }
     }
 
-    const meanR = sumR / numPixels;
-    const meanG = sumG / numPixels;
-    const meanB = sumB / numPixels;
-
-    features[0] = meanR;
-    features[1] = meanG;
-    features[2] = meanB;
+    features[0] = sumR / numPixels;
+    features[1] = sumG / numPixels;
+    features[2] = sumB / numPixels;
     features[3] = brownSpotPixels / numPixels;
     features[4] = yellowMarginPixels / numPixels;
     features[5] = darkLesionPixels / numPixels;
 
     for (let f = 6; f < featureDim; f++) {
-      const idx = (f * 17) % data.length;
+      const idx = (f * 17) % len;
       features[f] = (data[idx] ?? 0) * Math.cos(f * 0.5);
     }
 

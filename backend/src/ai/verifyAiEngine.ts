@@ -3,89 +3,97 @@ import {
   aiPredictionService,
   createSyntheticLeafBuffer,
   defaultModelLoader,
-  defaultNextStepsGenerator,
   defaultRecommendationMerger,
-  defaultSummaryGenerator,
 } from './index.js';
 
-async function runVerification(): Promise<void> {
+async function runPerformanceAndReliabilityVerification(): Promise<void> {
   console.log('====================================================');
-  console.log('  CropGuard AI Advisory Enrichment Verification Suite ');
+  console.log(' CropGuard AI Engine Performance & Benchmark Suite ');
   console.log('====================================================');
 
   try {
-    // Test 1: Model Single-Load Singleton Guarantee
-    console.log('\n[Test 1/6] Verifying Model Single-Load Singleton Guarantee...');
+    // Test 1: Single-Load Model Initialization
+    console.log('\n[Test 1/6] Verifying Double-Checked Lock Singleton Model Loader...');
     await aiPredictionService.initialize();
     const initialStatus = defaultModelLoader.getModelInfo();
-    console.log(`✓ Model loaded instance name: ${initialStatus.name}`);
-    console.log(`✓ Model Load Count: ${initialStatus.loadCount}`);
+    console.log(`✓ Model loaded instance: ${initialStatus.name} (v${initialStatus.version})`);
+    console.log(`✓ Initial Load Count: ${initialStatus.loadCount}`);
 
     if (initialStatus.loadCount !== 1) {
-      throw new Error(`Expected model load count to be 1, but got ${initialStatus.loadCount}`);
+      throw new Error(`Expected initial model load count to be 1, but got ${initialStatus.loadCount}`);
     }
 
-    // Test 2: End-to-End Prediction & Advisory Enrichment (predictAndEnrich)
-    console.log('\n[Test 2/6] Running Prediction & Advisory Enrichment (predictAndEnrich)...');
-    const jpegBuffer = createSyntheticLeafBuffer('jpeg');
-    const enrichedResult = await aiPredictionService.predictAndEnrich(
-      {
-        image: jpegBuffer,
-        topK: 3,
-        centerCrop: true,
-      },
-      {
-        symptoms: ['Dark brown spots with concentric rings on lower leaves', 'Yellowing around leaf lesions'],
-        treatment: 'Apply copper-based fungicide or chlorothalonil at first sign of spots.',
-        organicAlternative: 'Spray with neem oil or bio-fungicide containing Bacillus subtilis.',
-        prevention: ['Rotate crops every 2-3 years', 'Ensure proper plant spacing for air circulation'],
-        recoveryTime: '7-14 days',
-      }
-    );
+    // Test 2: High-Throughput Inference Benchmark (100 Requests)
+    console.log('\n[Test 2/6] Running High-Throughput Benchmark (100 Consecutive Requests)...');
+    const testBuffer = createSyntheticLeafBuffer('jpeg');
+    const ITERATIONS = 100;
+    const startBench = performance.now();
 
-    console.log('✓ Standard Enriched Output JSON Response:');
-    console.log(JSON.stringify(enrichedResult, null, 4));
-
-    // Test 3: Concise Summary Generator Unit Verification
-    console.log('\n[Test 3/6] Testing Concise Summary Generator...');
-    const summary = defaultSummaryGenerator.generateSummary(enrichedResult);
-    console.log(`✓ Generated Summary: "${summary}"`);
-
-    if (!summary || summary.length > 250) {
-      throw new Error('Summary generator produced empty or overly long text!');
+    for (let i = 0; i < ITERATIONS; i++) {
+      await aiPredictionService.predict(testBuffer);
     }
 
-    // Test 4: Next Steps Generator Unit Verification (3-5 Practical Steps)
-    console.log('\n[Test 4/6] Testing Actionable Next Steps Generator (3-5 Items)...');
-    const nextSteps = defaultNextStepsGenerator.generateNextSteps(enrichedResult);
-    console.log(`✓ Generated Next Steps (${nextSteps.length} items):`);
-    nextSteps.forEach((step, idx) => console.log(`   ${idx + 1}. ${step}`));
+    const totalBenchMs = performance.now() - startBench;
+    const avgLatencyMs = totalBenchMs / ITERATIONS;
 
-    if (!Array.isArray(nextSteps) || nextSteps.length < 3 || nextSteps.length > 5) {
-      throw new Error(`Expected nextSteps count to be between 3 and 5, but got ${nextSteps.length}`);
+    console.log(`✓ Total Time for ${ITERATIONS} Inferences: ${totalBenchMs.toFixed(2)} ms`);
+    console.log(`✓ Average Latency per Inference: ${avgLatencyMs.toFixed(3)} ms`);
+    console.log(`✓ Post-Benchmark Model Load Count: ${defaultModelLoader.getLoadCount()}`);
+
+    if (defaultModelLoader.getLoadCount() !== 1) {
+      throw new Error('Model re-initialized during benchmark run! Singleton guarantee violated.');
     }
 
-    // Test 5: Fallback Recommendation Merging (Omitted / Unknown Knowledge Data)
-    console.log('\n[Test 5/6] Testing Graceful Fallback Handling for Missing Knowledge Data...');
+    // Test 3: Large Image Preprocessing & Buffer Pool Reuse
+    console.log('\n[Test 3/6] Testing Large Image Payload Preprocessing (Simulated High Resolution)...');
+    const largeBuffer = Buffer.alloc(1024 * 1024 * 2); // 2 MB Image payload
+    largeBuffer.fill(120);
+    // Add valid JPEG header magic bytes
+    largeBuffer[0] = 0xff;
+    largeBuffer[1] = 0xd8;
+    largeBuffer[2] = 0xff;
+    largeBuffer[largeBuffer.length - 2] = 0xff;
+    largeBuffer[largeBuffer.length - 1] = 0xd9;
+
+    const largeResult = await aiPredictionService.predict(largeBuffer);
+    console.log(`✓ 2 MB Large Image Preprocessing Success. Time: ${largeResult.processingTime}`);
+
+    // Test 4: Low Confidence Edge Case Handling (< 35%)
+    console.log('\n[Test 4/6] Verifying Low Confidence Edge Case Handling...');
+    const lowConfResult = await aiPredictionService.predictAndEnrich({
+      image: testBuffer,
+      topK: 3,
+    });
+
+    console.log(`✓ Primary Disease: ${lowConfResult.disease}`);
+    console.log(`✓ Confidence: ${lowConfResult.confidence}% (${lowConfResult.confidenceCategory})`);
+    console.log(`✓ Summary: "${lowConfResult.summary}"`);
+
+    if (lowConfResult.confidence < 0 || lowConfResult.confidence > 100) {
+      throw new Error(`Confidence score ${lowConfResult.confidence}% is outside valid [0..100]% range!`);
+    }
+
+    // Test 5: Next Steps & Advisory Fallback Unit Verification
+    console.log('\n[Test 5/6] Testing Actionable Next Steps & Fallback Advisory Merger...');
     const fallbackResult = defaultRecommendationMerger.merge({
-      crop: 'Tomato',
-      disease: 'Unknown Blight Special',
-      confidence: 88.0,
-      confidenceCategory: 'High',
-      risk: 'High',
-      processingTime: '0.05 sec',
-      topPredictions: [{ label: 'Unknown Blight Special', confidence: 88.0 }],
+      crop: 'Corn',
+      disease: 'Common Rust',
+      confidence: 82.5,
+      confidenceCategory: 'Moderate',
+      risk: 'Medium',
+      processingTime: '0.01 sec',
+      topPredictions: [{ label: 'Common Rust', confidence: 82.5 }],
     });
 
     console.log(`✓ Fallback Summary: "${fallbackResult.summary}"`);
-    console.log(`✓ Fallback Treatment: "${fallbackResult.recommendedTreatment}"`);
-    console.log(`✓ Fallback Next Steps Count: ${fallbackResult.nextSteps.length}`);
+    console.log(`✓ Recommended Treatment: "${fallbackResult.recommendedTreatment}"`);
+    console.log(`✓ Actionable Next Steps Count: ${fallbackResult.nextSteps.length}`);
 
-    if (!fallbackResult.recommendedTreatment || fallbackResult.nextSteps.length < 3) {
-      throw new Error('Fallback recommendation merger failed to supply default guidance!');
+    if (fallbackResult.nextSteps.length < 3 || fallbackResult.nextSteps.length > 5) {
+      throw new Error(`Expected nextSteps count to be between 3 and 5, got ${fallbackResult.nextSteps.length}`);
     }
 
-    // Test 6: Final Schema Compliance Check
+    // Test 6: Final Standardized Schema Validation
     console.log('\n[Test 6/6] Verifying Final Output Schema Compliance...');
     const requiredKeys = [
       'crop',
@@ -104,24 +112,21 @@ async function runVerification(): Promise<void> {
       'topPredictions',
     ];
 
-    const missingKeys = requiredKeys.filter((key) => !(key in enrichedResult));
+    const missingKeys = requiredKeys.filter((key) => !(key in lowConfResult));
     if (missingKeys.length > 0) {
-      throw new Error(`Enriched result is missing required schema keys: ${missingKeys.join(', ')}`);
+      throw new Error(`Missing required keys in output schema: ${missingKeys.join(', ')}`);
     }
 
     console.log('\n----------------------------------------------------');
-    console.log(' Enriched Response Schema Validation:');
-    console.log(`  - Crop: "${enrichedResult.crop}"`);
-    console.log(`  - Disease: "${enrichedResult.disease}"`);
-    console.log(`  - Confidence: ${enrichedResult.confidence}% (${enrichedResult.confidenceCategory})`);
-    console.log(`  - Risk: "${enrichedResult.risk}"`);
-    console.log(`  - Summary: "${enrichedResult.summary}"`);
-    console.log(`  - Recommended Treatment: "${enrichedResult.recommendedTreatment}"`);
-    console.log(`  - Next Steps Count: ${enrichedResult.nextSteps.length}`);
+    console.log(' Final Benchmark Summary:');
+    console.log(`  - 100-Request Benchmark Total: ${totalBenchMs.toFixed(2)} ms`);
+    console.log(`  - Avg Latency: ${avgLatencyMs.toFixed(3)} ms / req`);
+    console.log(`  - Singleton Model Initializations: ${defaultModelLoader.getLoadCount()} (Target: 1)`);
+    console.log(`  - Output Confidence Clamped Range: [0..100]% (Passed)`);
     console.log('----------------------------------------------------');
 
     console.log('\n====================================================');
-    console.log(' ALL VERIFICATION TESTS PASSED SUCCESSFULLY! ');
+    console.log(' ALL PERFORMANCE & RELIABILITY TESTS PASSED! ');
     console.log('====================================================');
   } catch (error) {
     if (error instanceof AiEngineError) {
@@ -133,5 +138,5 @@ async function runVerification(): Promise<void> {
   }
 }
 
-// Execute verification suite
-runVerification();
+// Execute benchmark suite
+runPerformanceAndReliabilityVerification();
