@@ -47,6 +47,7 @@ export interface PredictionRequest {
   cropId?: string;
   imageUrl?: string;
   imageBase64?: string;
+  uploadId?: string;
 }
 
 export interface PredictionResult {
@@ -66,4 +67,30 @@ export interface HistoryItem {
   confidence: number;
   imageUrl?: string;
   createdAt: string;
+}
+
+// Image Upload Specifications & Types
+
+export interface UploadedFile {
+  originalname: string;
+  buffer: Buffer;
+  mimetype: string;
+  size: number;
+}
+
+export interface ImageUploadMetadata {
+  uploadId: string;
+  fileName: string;
+  fileSize: string;
+  mimeType: string;
+  uploadedAt: string;
+  status: 'READY_FOR_PREDICTION';
+}
+
+declare global {
+  namespace Express {
+    interface Request {
+      file?: UploadedFile;
+    }
+  }
 }
