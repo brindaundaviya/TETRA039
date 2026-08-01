@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { MainLayout } from '@/components/layout';
+import { useDetection } from '@/hooks';
 import {
   HeaderSection,
   ImageUploadCard,
@@ -11,117 +11,72 @@ import {
   SimilarDiseases,
   PredictionTimeline,
   ExportActionsCard,
+  ErrorCard,
+  DetectionSkeleton,
   type PredictionData,
   type TreatmentDetails,
 } from '@/components/detection';
-
-const MOCK_PAYLOADS: Record<string, { prediction: PredictionData; treatment: TreatmentDetails }> = {
-  'tomato-early-blight': {
-    prediction: {
-      diseaseName: 'Tomato Early Blight (Alternaria solani)',
-      scientificName: 'Alternaria solani',
-      cropType: 'Tomato',
-      riskLevel: 'High Risk',
-      confidence: 97.4,
-      predictionTime: '420 ms',
-      modelVersion: 'CropGuard-Vision-v2.4',
-    },
-    treatment: {
-      immediateAction: 'Isolate affected foliage and apply copper hydroxide spray within 24-48 hours.',
-      recommendedTreatment: 'Foliar spray with Copper Sulfate or Chlorothalonil twice weekly until lesion growth halts.',
-      organicSolution: 'Spray Neem oil extract (5ml/L) and Trichoderma harzianum bio-fungicide to suppress spore spread.',
-      chemicalSolution: 'Mancozeb 75% WP @ 2g/liter of water during early onset stage.',
-      recoveryTime: '7 - 14 Days',
-      priorityLevel: 'High Priority',
-    },
-  },
-  'potato-late-blight': {
-    prediction: {
-      diseaseName: 'Potato Late Blight (Phytophthora infestans)',
-      scientificName: 'Phytophthora infestans',
-      cropType: 'Potato',
-      riskLevel: 'High Risk',
-      confidence: 98.9,
-      predictionTime: '380 ms',
-      modelVersion: 'CropGuard-Vision-v2.4',
-    },
-    treatment: {
-      immediateAction: 'Prune infected vines immediately and avoid overhead irrigation to curb moisture.',
-      recommendedTreatment: 'Apply systemic fungicide containing Cymoxanil or Dimethomorph immediately.',
-      organicSolution: 'Apply bio-fungicide Bacillus subtilis and improve field soil drainage.',
-      chemicalSolution: 'Metalaxyl-M + Mancozeb mixture applied @ 2.5g/L water.',
-      recoveryTime: '10 - 21 Days',
-      priorityLevel: 'High Priority',
-    },
-  },
-  'rice-healthy': {
-    prediction: {
-      diseaseName: 'Healthy Rice Leaf Foliage',
-      scientificName: 'Oryza sativa (Pathogen Free)',
-      cropType: 'Rice',
-      riskLevel: 'Healthy',
-      confidence: 99.2,
-      predictionTime: '290 ms',
-      modelVersion: 'CropGuard-Vision-v2.4',
-    },
-    treatment: {
-      immediateAction: 'No immediate curative treatment needed. Continue normal field monitoring.',
-      recommendedTreatment: 'Maintain balanced NPK nitrogen-potassium nutrient scheduling.',
-      organicSolution: 'Apply organic compost extract to fortify cellular cell walls.',
-      chemicalSolution: 'None required. Keep preventive bio-booster on standby.',
-      recoveryTime: 'Optimal Health',
-      priorityLevel: 'Standard Care',
-    },
-  },
-};
+import type { DetectionErrorCategory } from '@/types';
 
 export function DetectionPage() {
-  const [selectedImage, setSelectedImage] = useState<string | null>(
-    MOCK_PAYLOADS['tomato-early-blight'] ? 'https://images.unsplash.com/photo-1592417817098-8f3d6ef23a2f?w=600&auto=format&fit=crop&q=80' : null
-  );
-  const [activePayloadKey, setActivePayloadKey] = useState<string>('tomato-early-blight');
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [progressStage, setProgressStage] = useState('Uploading...');
+  const {
+    selectedImage,
+    isAnalyzing,
+    progress,
+    progressStage,
+    prediction,
+    error,
+    selectImage,
+    removeImage,
+    runDetection,
+    clearError,
+    triggerErrorSimulation,
+  } = useDetection();
 
-  const activePayload = MOCK_PAYLOADS[activePayloadKey] || MOCK_PAYLOADS['tomato-early-blight'];
-
-  const handleImageSelect = (imageUrl: string, presetId?: string) => {
-    setSelectedImage(imageUrl);
-    const key = presetId || 'tomato-early-blight';
-    setActivePayloadKey(key);
+  const mapRiskLevel = (risk?: string): 'High Risk' | 'Medium Risk' | 'Low Risk' | 'Healthy' => {
+    if (risk === 'High') return 'High Risk';
+    if (risk === 'Medium') return 'Medium Risk';
+    if (risk === 'Low') return 'Low Risk';
+    if (risk === 'Healthy') return 'Healthy';
+    return 'High Risk';
   };
 
-  const handleImageRemove = () => {
-    setSelectedImage(null);
-  };
+  // Adapt PredictionPayload to component interfaces safely
+  const predictionData: PredictionData | null = prediction
+    ? {
+        diseaseName: prediction.disease,
+        scientificName: prediction.scientificName || `${prediction.crop} Pathogen`,
+        cropType: prediction.crop,
+        riskLevel: mapRiskLevel(prediction.risk),
+        confidence: prediction.confidence || 97.4,
+        predictionTime: `${prediction.predictionTimeMs || 420} ms`,
+        modelVersion: prediction.modelVersion || 'CropGuard-Vision-v2.4',
+      }
+    : null;
 
-  const handleStartAnalysis = () => {
-    setIsAnalyzing(true);
-    setProgress(0);
-    setProgressStage('Uploading...');
-
-    // Simulated progress timer
-    const interval = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(interval);
-          setIsAnalyzing(false);
-          return 100;
-        }
-
-        const next = prev + 25;
-        if (next >= 75) {
-          setProgressStage('Analyzing Cellular Features...');
-        } else if (next >= 50) {
-          setProgressStage('Processing Image Matrix...');
-        } else if (next >= 25) {
-          setProgressStage('Uploading to GPU Pipeline...');
-        }
-        return next;
-      });
-    }, 350);
-  };
+  const treatmentData: TreatmentDetails | null = prediction
+    ? {
+        immediateAction:
+          prediction.immediateAction ||
+          'Isolate affected foliage immediately and avoid overhead watering.',
+        recommendedTreatment:
+          prediction.recommendation ||
+          'Foliar spray with Copper Sulfate or Chlorothalonil twice weekly.',
+        organicSolution:
+          prediction.organicSolution ||
+          'Spray Neem oil extract (5ml/L) and Trichoderma harzianum bio-fungicide.',
+        chemicalSolution:
+          prediction.chemicalSolution ||
+          'Mancozeb 75% WP @ 2g/liter of water during early onset.',
+        recoveryTime: prediction.recoveryTime || '7 - 14 Days',
+        priorityLevel:
+          prediction.risk === 'High'
+            ? 'High Priority'
+            : prediction.risk === 'Medium'
+            ? 'Medium Priority'
+            : 'Standard Care',
+      }
+    : null;
 
   return (
     <MainLayout title="AI Crop Disease Detection">
@@ -130,7 +85,16 @@ export function DetectionPage() {
         {/* Section 1: Header */}
         <HeaderSection />
 
-        {/* Desktop 2-Column Grid / Mobile Stacked */}
+        {/* Diagnostic Error Banner (if error state is active) */}
+        {error && (
+          <ErrorCard
+            error={error}
+            onRetry={runDetection}
+            onDismiss={clearError}
+          />
+        )}
+
+        {/* 2-Column Responsive Layout: Desktop Left/Right, Mobile Stacked */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
           
           {/* Left Column (Upload, Progress & Timeline) - 5 Cols on lg */}
@@ -139,16 +103,43 @@ export function DetectionPage() {
             {/* Section 2: Image Upload Card */}
             <ImageUploadCard
               selectedImage={selectedImage}
-              onImageSelect={handleImageSelect}
-              onImageRemove={handleImageRemove}
+              onImageSelect={selectImage}
+              onImageRemove={removeImage}
               isAnalyzing={isAnalyzing}
-              onAnalyzeStart={handleStartAnalysis}
+              onAnalyzeStart={runDetection}
             />
 
-            {/* Section 3: Animated Upload Progress Bar */}
+            {/* Section 3: Animated Upload & Analysis Progress Bar */}
             {isAnalyzing && (
               <AnalysisProgress progress={progress} stage={progressStage} />
             )}
+
+            {/* Error Test Simulation Shortcuts (Demo & Testing Bar) */}
+            <div className="p-4 rounded-2xl glass border border-white/5 space-y-2">
+              <div className="text-[11px] font-mono text-slate-400 uppercase tracking-wider">
+                Interactive Error Test Panel (Hackathon Demo)
+              </div>
+              <div className="flex flex-wrap gap-1.5">
+                {(
+                  [
+                    'INVALID_FILE',
+                    'NETWORK_ERROR',
+                    'SERVER_ERROR',
+                    'API_TIMEOUT',
+                    'NO_INTERNET',
+                  ] as DetectionErrorCategory[]
+                ).map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => triggerErrorSimulation(cat)}
+                    className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 text-[10px] font-mono text-slate-300 border border-white/5 transition-colors"
+                  >
+                    Simulate {cat}
+                  </button>
+                ))}
+              </div>
+            </div>
 
             {/* Section 9: Prediction Timeline */}
             <PredictionTimeline />
@@ -158,23 +149,32 @@ export function DetectionPage() {
           {/* Right Column (Results, Confidence, Remedies & Export) - 7 Cols on lg */}
           <div className="lg:col-span-7 space-y-6">
             
-            {/* Section 4: Prediction Result Card */}
-            <PredictionResultCard prediction={activePayload.prediction} />
+            {/* Skeleton Loading Experience during analysis */}
+            {isAnalyzing && <DetectionSkeleton />}
 
-            {/* Section 5: Confidence Visualization */}
-            <ConfidenceGauge confidence={activePayload.prediction.confidence} />
+            {/* Section 4: Prediction Result Card */}
+            {!isAnalyzing && predictionData && (
+              <PredictionResultCard prediction={predictionData} />
+            )}
+
+            {/* Section 5: Confidence Gauge */}
+            {!isAnalyzing && predictionData && (
+              <ConfidenceGauge confidence={predictionData.confidence} />
+            )}
 
             {/* Section 6: Treatment Recommendation */}
-            <TreatmentCard treatment={activePayload.treatment} />
+            {!isAnalyzing && treatmentData && (
+              <TreatmentCard treatment={treatmentData} />
+            )}
 
             {/* Section 7: Preventive Measures Checklist */}
-            <PreventiveMeasures />
+            {!isAnalyzing && <PreventiveMeasures />}
 
             {/* Section 8: Similar Diseases (Differential Diagnosis) */}
-            <SimilarDiseases />
+            {!isAnalyzing && <SimilarDiseases />}
 
             {/* Section 10: Export Shortcuts Card */}
-            <ExportActionsCard />
+            {!isAnalyzing && <ExportActionsCard />}
 
           </div>
 

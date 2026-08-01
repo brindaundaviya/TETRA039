@@ -39,3 +39,48 @@ export interface DashboardStats {
   healthyCrops: number;
   accuracyRate: number;
 }
+
+export interface PredictionPayload {
+  crop: string;
+  disease: string;
+  confidence: number;
+  risk: 'High' | 'Medium' | 'Low' | 'Healthy';
+  recommendation: string;
+  prevention: string[];
+  scientificName?: string;
+  immediateAction?: string;
+  organicSolution?: string;
+  chemicalSolution?: string;
+  recoveryTime?: string;
+  predictionTimeMs?: number;
+  modelVersion?: string;
+  similarDiseases?: Array<{
+    name: string;
+    scientificName?: string;
+    confidence: number;
+    description: string;
+    differentiatingFactor?: string;
+  }>;
+}
+
+export interface PredictApiResponse {
+  success: boolean;
+  prediction?: PredictionPayload;
+  message?: string;
+  error?: string;
+}
+
+export type DetectionErrorCategory =
+  | 'INVALID_FILE'
+  | 'NETWORK_ERROR'
+  | 'SERVER_ERROR'
+  | 'PREDICTION_FAILED'
+  | 'NO_INTERNET'
+  | 'API_TIMEOUT';
+
+export interface DetectionErrorState {
+  category: DetectionErrorCategory;
+  title: string;
+  message: string;
+  details?: string;
+}

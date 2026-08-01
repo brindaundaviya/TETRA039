@@ -8,3 +8,5 @@ export { PreventiveMeasures } from './PreventiveMeasures';
 export { SimilarDiseases } from './SimilarDiseases';
 export { PredictionTimeline } from './PredictionTimeline';
 export { ExportActionsCard } from './ExportActionsCard';
+export { ErrorCard } from './ErrorCard';
+export { DetectionSkeleton } from './DetectionSkeleton';
