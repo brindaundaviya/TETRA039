@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { predictCropDisease } from '@/services/detectionService';
+import { historyService } from '@/services/historyService';
 import type { PredictionPayload, DetectionErrorState, DetectionErrorCategory } from '@/types';
 
 export function useDetection() {
@@ -198,6 +199,23 @@ export function useDetection() {
 
       if (response.success && response.prediction) {
         setPrediction(response.prediction);
+        // Persist to history storage automatically
+        historyService.savePrediction({
+          crop: response.prediction.crop,
+          disease: response.prediction.disease,
+          scientificName: response.prediction.scientificName,
+          confidence: response.prediction.confidence,
+          risk: response.prediction.risk,
+          imageUrl: selectedImage || 'https://images.unsplash.com/photo-1592417817098-8f3d6ef23a2f?w=600&auto=format&fit=crop&q=80',
+          recommendation: response.prediction.recommendation,
+          prevention: response.prediction.prevention || [],
+          immediateAction: response.prediction.immediateAction,
+          organicSolution: response.prediction.organicSolution,
+          chemicalSolution: response.prediction.chemicalSolution,
+          recoveryTime: response.prediction.recoveryTime,
+          predictionTimeMs: response.prediction.predictionTimeMs,
+          modelVersion: response.prediction.modelVersion,
+        });
       } else {
         setError({
           category: 'PREDICTION_FAILED',

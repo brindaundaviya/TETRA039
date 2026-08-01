@@ -84,3 +84,43 @@ export interface DetectionErrorState {
   message: string;
   details?: string;
 }
+
+export type RiskLevel = 'High' | 'Medium' | 'Low' | 'Healthy';
+
+export interface HistoryPrediction {
+  id: string;
+  crop: string;
+  disease: string;
+  scientificName?: string;
+  confidence: number;
+  risk: RiskLevel;
+  timestamp: string;
+  imageUrl: string;
+  recommendation: string;
+  prevention: string[];
+  immediateAction?: string;
+  organicSolution?: string;
+  chemicalSolution?: string;
+  recoveryTime?: string;
+  predictionTimeMs?: number;
+  modelVersion?: string;
+  status?: 'healthy' | 'diseased' | 'pending';
+}
+
+export interface HistoryFilterState {
+  search: string;
+  crop: string;
+  disease: string;
+  risk: string;
+  confidenceRange: 'ALL' | 'HIGH' | 'MEDIUM' | 'LOW';
+  dateRange: 'ALL' | 'TODAY' | 'WEEK' | 'MONTH';
+  sortBy: 'date_desc' | 'date_asc' | 'confidence_desc' | 'confidence_asc' | 'crop_asc';
+}
+
+export interface HistorySummaryStats {
+  totalPredictions: number;
+  healthyPlants: number;
+  diseasedPlants: number;
+  averageConfidence: number;
+}
+
