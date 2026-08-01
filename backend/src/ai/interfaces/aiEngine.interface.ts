@@ -5,9 +5,11 @@
 
 /**
  * Standard prediction result item in top predictions array.
+ * Includes 'label' as specified in output schema (and optional 'name' for backward compatibility).
  */
 export interface TopPredictionItem {
-  name: string;
+  label: string;
+  name?: string;
   confidence: number;
 }
 
@@ -19,6 +21,7 @@ export interface StandardPredictionOutput {
   disease: string;
   confidence: number;
   topPredictions: TopPredictionItem[];
+  processingTime: string;
 }
 
 /**
@@ -27,12 +30,24 @@ export interface StandardPredictionOutput {
 export type ImageInput = Buffer | string;
 
 /**
- * Structured image input with optional hints.
+ * Structured image input with optional hints and configuration options.
  */
 export interface PredictionInputOptions {
   image: ImageInput;
   cropHint?: string;
   topK?: number;
+  centerCrop?: boolean;
+}
+
+/**
+ * Configurable preprocessor settings.
+ */
+export interface PreprocessingOptions {
+  targetWidth?: number;
+  targetHeight?: number;
+  targetChannels?: number;
+  centerCrop?: boolean;
+  stripAlpha?: boolean;
 }
 
 /**
@@ -70,7 +85,7 @@ export interface CropDiseaseClassInfo {
  * Preprocessor interface contract.
  */
 export interface IImagePreprocessor {
-  preprocess(input: ImageInput): Promise<PreprocessedTensorData>;
+  preprocess(input: ImageInput, options?: PreprocessingOptions): Promise<PreprocessedTensorData>;
 }
 
 /**

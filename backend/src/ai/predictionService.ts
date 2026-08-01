@@ -1,4 +1,5 @@
 import { AI_CONFIG } from './config/aiConfig.js';
+import { AiEngineError } from './errors/aiErrors.js';
 import { defaultResponseFormatter } from './formatting/responseFormatter.js';
 import { defaultInferenceEngine } from './inference/predictionPipeline.js';
 import type {
@@ -8,6 +9,7 @@ import type {
   IResponseFormatter,
   ImageInput,
   PredictionInputOptions,
+  PreprocessingOptions,
   StandardPredictionOutput,
 } from './interfaces/aiEngine.interface.js';
 import { defaultModelLoader } from './loader/modelLoader.js';
@@ -32,43 +34,65 @@ export class AiPredictionService {
   }
 
   /**
-   * Initialize and pre-warm model. Call during application startup if desired.
+   * Pre-load AI model during backend startup (guarantees model is loaded ONCE).
    */
   public async initialize(): Promise<void> {
     await this.modelLoader.loadModel();
   }
 
   /**
-   * Run full AI prediction pipeline on an input leaf image.
+   * Run production AI prediction pipeline on an input crop leaf image.
+   * Execution Flow:
+   * 1. Validate Image (File exists, JPG/JPEG/PNG format check, corrupted buffer check).
+   * 2. Preprocess Image (EXIF orientation, strip alpha RGBA->RGB, center crop, resize to 224x224, normalize).
+   * 3. Run Inference (Reuse single loaded model instance, compute Wx+b logits, softmax).
+   * 4. Decode & Format Predictions (Map class IDs to crop/disease, calculate topK, format processing time).
    *
-   * @param options Image buffer or Base64 string, or options object
-   * @returns StandardPredictionOutput matching CropGuard AI output specification
+   * @param options Image buffer or Base64 string, or PredictionInputOptions object
+   * @returns StandardPredictionOutput matching exact CropGuard AI JSON specification
    */
   public async predict(options: ImageInput | PredictionInputOptions): Promise<StandardPredictionOutput> {
-    const inputImage: ImageInput =
-      typeof options === 'object' && options !== null && 'image' in options ? options.image : (options as ImageInput);
+    try {
+      const inputImage: ImageInput =
+        typeof options === 'object' && options !== null && 'image' in options ? options.image : (options as ImageInput);
 
-    const topK =
-      typeof options === 'object' && options !== null && 'topK' in options && options.topK
-        ? options.topK
-        : AI_CONFIG.defaultTopK;
+      const topK =
+        typeof options === 'object' && options !== null && 'topK' in options && options.topK
+          ? options.topK
+          : AI_CONFIG.defaultTopK;
 
-    // Pipeline Step 1: Preprocess raw image buffer into tensor representation
-    const tensor = await this.preprocessor.preprocess(inputImage);
+      const centerCrop =
+        typeof options === 'object' && options !== null && 'centerCrop' in options && options.centerCrop !== undefined
+          ? options.centerCrop
+          : true;
 
-    // Pipeline Step 2 & 3: Run Model forward pass & raw inference
-    const rawOutput = await this.inferenceEngine.predict(tensor);
+      const preprocessOpts: PreprocessingOptions = {
+        centerCrop,
+        stripAlpha: true,
+      };
 
-    // Pipeline Step 4 & 5: Format confidence scores, top predictions, and standard response JSON
-    const result = this.formatter.format(rawOutput, topK);
+      // Step 1 & 2: Validate image and preprocess into tensor representation
+      const tensor = await this.preprocessor.preprocess(inputImage, preprocessOpts);
 
-    return result;
+      // Step 3: Run Model Forward Pass & Raw Inference (Model is loaded ONCE & reused)
+      const rawOutput = await this.inferenceEngine.predict(tensor);
+
+      // Step 4: Decode predictions & format standard JSON response
+      const result = this.formatter.format(rawOutput, topK);
+
+      return result;
+    } catch (err) {
+      if (err instanceof AiEngineError) {
+        throw err;
+      }
+      throw err;
+    }
   }
 
   /**
-   * Get metadata about current AI Engine model version and load status.
+   * Get metadata about AI Engine model version, load status, and total load count.
    */
-  public getEngineStatus(): { isLoaded: boolean; modelInfo: { name: string; version: string } } {
+  public getEngineStatus(): { isLoaded: boolean; modelInfo: { name: string; version: string; loadCount?: number } } {
     return {
       isLoaded: this.modelLoader.isLoaded(),
       modelInfo: this.modelLoader.getModelInfo(),
@@ -76,5 +100,5 @@ export class AiPredictionService {
   }
 }
 
-// Singleton instance export for easy backend plug-in
+// Singleton instance export for backend integration
 export const aiPredictionService = new AiPredictionService();

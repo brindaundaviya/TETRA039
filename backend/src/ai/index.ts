@@ -1,11 +1,21 @@
 /**
  * CropGuard AI Engine Foundation Barrel Export
  *
- * Plug-and-play AI Module for Crop Disease Image Inference.
+ * Production-Quality Image Preprocessing & Inference Pipeline Module.
  */
 
 // Configuration
 export { AI_CONFIG, type AiEngineConfig } from './config/aiConfig.js';
+
+// Custom Error Classes
+export {
+  AiEngineError,
+  CorruptedImageError,
+  ImageValidationError,
+  InferenceExecutionError,
+  ModelLoadError,
+  UnsupportedImageFormatError,
+} from './errors/aiErrors.js';
 
 // Core Interfaces
 export type {
@@ -16,23 +26,29 @@ export type {
   ImageInput,
   IResponseFormatter,
   PredictionInputOptions,
+  PreprocessingOptions,
   PreprocessedTensorData,
   RawPredictionOutput,
   StandardPredictionOutput,
   TopPredictionItem,
 } from './interfaces/aiEngine.interface.js';
 
-// Individual Component Implementations
+// Component Implementations
 export { CropGuardResponseFormatter, defaultResponseFormatter } from './formatting/responseFormatter.js';
 export { PlantVillageInferenceEngine, defaultInferenceEngine } from './inference/predictionPipeline.js';
 export { PlantVillageModelLoader, defaultModelLoader } from './loader/modelLoader.js';
-export { CropDiseaseClassInfo as DiseaseLabels } from './interfaces/aiEngine.interface.js';
 export { CROP_DISEASE_LABELS, getDiseaseClassInfo } from './models/diseaseLabels.js';
 export { CropImagePreprocessor, defaultImagePreprocessor } from './preprocessing/imagePreprocessor.js';
 
-// Main Service Facade (Primary Plugin Point)
+// Primary Facade Service
 export { AiPredictionService, aiPredictionService } from './predictionService.js';
 
 // Utilities
-export { createSyntheticLeafBuffer, detectImageFormat, normalizeImageToBuffer } from './utils/imageUtils.js';
+export {
+  checkPngAlphaChannel,
+  createSyntheticLeafBuffer,
+  detectSupportedFormat,
+  normalizeAndValidateImage,
+  parseExifOrientation,
+} from './utils/imageUtils.js';
 export { getTopKIndices, softmax, toPercentage } from './utils/mathUtils.js';
