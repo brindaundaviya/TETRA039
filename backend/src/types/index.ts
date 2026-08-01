@@ -43,21 +43,21 @@ export interface Disease {
   severity: 'low' | 'medium' | 'high' | 'critical';
 }
 
-export interface PredictionRequest {
-  cropId?: string;
+export interface PredictionRequestPayload {
+  uploadId?: string;
   imageUrl?: string;
   imageBase64?: string;
-  uploadId?: string;
+  cropHint?: string;
 }
 
-export interface PredictionResult {
-  id: string;
-  cropName: string;
-  diseaseName: string;
+export interface AiPredictionData {
+  crop: string;
+  disease: string;
   confidence: number;
-  symptoms: string[];
-  recommendations: string[];
-  timestamp: string;
+  risk: string;
+  recommendation: string;
+  prevention: string[];
+  processingTime: string;
 }
 
 export interface HistoryItem {

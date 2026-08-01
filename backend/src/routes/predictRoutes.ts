@@ -7,7 +7,9 @@ const router = Router();
 
 router.post(
   '/',
-  validateRequest([commonRules.requireOneOfBodyFields(['cropId', 'imageUrl', 'imageBase64'])]),
+  validateRequest([
+    commonRules.requireOneOfBodyFields(['uploadId', 'cropId', 'imageUrl', 'imageBase64']),
+  ]),
   predictCropDisease
 );
 

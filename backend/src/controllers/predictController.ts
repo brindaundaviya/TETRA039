@@ -1,14 +1,14 @@
 import type { Request, Response } from 'express';
 import { predictService } from '../services/predictService.js';
 import { uploadService } from '../services/uploadService.js';
-import type { PredictionRequest } from '../types/index.js';
+import type { PredictionRequestPayload } from '../types/index.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { sendSuccess } from '../utils/response.js';
 
 export const predictCropDisease = asyncHandler(
-  async (req: Request<Record<string, string>, unknown, PredictionRequest>, res: Response) => {
-    const result = await predictService.predict(req.body);
-    return sendSuccess(res, result, 'Prediction generated successfully');
+  async (req: Request<Record<string, string>, unknown, PredictionRequestPayload>, res: Response) => {
+    const prediction = await predictService.predict(req.body);
+    return sendSuccess(res, prediction, 'Prediction completed successfully');
   }
 );
 
