@@ -23,7 +23,7 @@ export interface AppError extends Error {
   isOperational?: boolean;
 }
 
-// Domain Model Interfaces (Prepared for Future Business Logic / AI Integration)
+// Domain Model Interfaces
 
 export interface Crop {
   id: string;
@@ -33,14 +33,36 @@ export interface Crop {
   description?: string;
 }
 
-export interface Disease {
+export interface DetailedDiseaseInfo {
   id: string;
-  cropId: string;
-  name: string;
+  diseaseName: string;
+  cropName: string;
+  cause: string;
+  severity: 'Low' | 'Medium' | 'High' | 'Critical';
   symptoms: string[];
-  preventiveMeasures: string[];
-  treatment?: string;
-  severity: 'low' | 'medium' | 'high' | 'critical';
+  immediateAction: string;
+  treatment: string;
+  organicAlternative: string;
+  prevention: string[];
+  recoveryTime: string;
+}
+
+export interface RecommendationRequestPayload {
+  crop: string;
+  disease: string;
+}
+
+export interface RecommendationResponseData {
+  crop: string;
+  disease: string;
+  severity: string;
+  cause: string;
+  symptoms: string[];
+  immediateAction: string;
+  treatment: string;
+  organicAlternative: string;
+  prevention: string[];
+  recoveryTime: string;
 }
 
 export interface PredictionRequestPayload {

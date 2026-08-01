@@ -1,0 +1,261 @@
+import type { Crop, DetailedDiseaseInfo } from '../types/index.js';
+
+export const SUPPORTED_CROPS: Crop[] = [
+  {
+    id: 'crop_tomato',
+    name: 'Tomato',
+    scientificName: 'Solanum lycopersicum',
+    category: 'Solanaceous Vegetable',
+    description: 'High-value fruit vegetable susceptible to fungal foliar blights and viral leaf curls.',
+  },
+  {
+    id: 'crop_potato',
+    name: 'Potato',
+    scientificName: 'Solanum tuberosum',
+    category: 'Tuber Crop',
+    description: 'Staple food tuber crop vulnerable to destructive Phytophthora blights and bacterial soft rot.',
+  },
+  {
+    id: 'crop_rice',
+    name: 'Rice',
+    scientificName: 'Oryza sativa',
+    category: 'Cereal Grain',
+    description: 'Primary grain food staple prone to fungal blast epidemics and bacterial leaf streak.',
+  },
+  {
+    id: 'crop_cotton',
+    name: 'Cotton',
+    scientificName: 'Gossypium hirsutum',
+    category: 'Fiber Crop',
+    description: 'Commercial fiber crop sensitive to bacterial leaf spot, Fusarium wilt, and leaf curl virus.',
+  },
+  {
+    id: 'crop_maize',
+    name: 'Maize',
+    scientificName: 'Zea mays',
+    category: 'Cereal Grain',
+    description: 'Major food and forage cereal grain susceptible to common rust and turcicum leaf blight.',
+  },
+];
+
+export const DISEASE_KNOWLEDGE_BASE: DetailedDiseaseInfo[] = [
+  // --- TOMATO DISEASES ---
+  {
+    id: 'dis_tomato_early_blight',
+    cropName: 'Tomato',
+    diseaseName: 'Early Blight',
+    cause: 'Fungal pathogen Alternaria solani',
+    severity: 'High',
+    symptoms: [
+      'Concentric target-board dark brown spots on older lower leaves',
+      'Yellow chlorotic halo surrounding leaf lesions',
+      'Premature defoliation exposing fruit to sunscald',
+    ],
+    immediateAction: 'Prune infected lower foliage immediately and burn or discard far from field.',
+    treatment: 'Spray copper octanoate or Chlorothalonil fungicide every 7 to 10 days.',
+    organicAlternative: 'Apply Neem oil (3%) or Bacillus subtilis bio-fungicide sprays at first sign.',
+    prevention: [
+      'Rotate crops with non-solanaceous species for at least 3 years',
+      'Utilize drip irrigation to avoid leaf moisture retention',
+      'Mulch soil surface with clean straw to prevent soil-borne spore splash',
+    ],
+    recoveryTime: '2 to 3 weeks with diligent treatment',
+  },
+  {
+    id: 'dis_tomato_late_blight',
+    cropName: 'Tomato',
+    diseaseName: 'Late Blight',
+    cause: 'Oomycete pathogen Phytophthora infestans',
+    severity: 'Critical',
+    symptoms: [
+      'Large dark water-soaked leaf lesions turning purplish-black',
+      'White cottony fungal growth on lower leaf surfaces under high humidity',
+      'Foul-smelling firm brown rot on green fruit',
+    ],
+    immediateAction: 'Isolate affected rows, destroy heavily infected plants immediately, and cease overhead watering.',
+    treatment: 'Apply systemic fungicides such as Cymoxanil + Mancozeb or Metalaxyl.',
+    organicAlternative: 'Copper hydroxide sprays combined with liquid seaweed extracts.',
+    prevention: [
+      'Plant certified disease-resistant tomato varieties',
+      'Maintain wide plant spacing for canopy ventilation',
+      'Monitor relative humidity and apply preventive bio-protective sprays',
+    ],
+    recoveryTime: '3 to 4 weeks (if caught early)',
+  },
+
+  // --- POTATO DISEASES ---
+  {
+    id: 'dis_potato_early_blight',
+    cropName: 'Potato',
+    diseaseName: 'Early Blight',
+    cause: 'Fungal pathogen Alternaria solani',
+    severity: 'Medium',
+    symptoms: [
+      'Dark brown angular spots with concentric rings on mature potato leaves',
+      'Leaves yellow and die off from bottom up',
+      'Sunken corky brown lesions on tubers',
+    ],
+    immediateAction: 'Remove severely infected lower leaves and optimize nitrogen fertilization.',
+    treatment: 'Fungicidal application of Mancozeb or Azoxystrobin.',
+    organicAlternative: 'Foliar application of Trichoderma viride or copper sulfate formulation.',
+    prevention: [
+      'Ensure balanced soil potassium and nitrogen levels',
+      'Destroy crop residue post harvest',
+      'Avoid mechanical damage to tubers during cultivation',
+    ],
+    recoveryTime: '2 weeks',
+  },
+  {
+    id: 'dis_potato_late_blight',
+    cropName: 'Potato',
+    diseaseName: 'Late Blight',
+    cause: 'Oomycete pathogen Phytophthora infestans',
+    severity: 'Critical',
+    symptoms: [
+      'Water-soaked dark lesions spreading rapidly across leaf blades',
+      'White downy fungal mildew on undersides of leaves during humid mornings',
+      'Dry reddish-brown rot penetrating potato tubers',
+    ],
+    immediateAction: 'Kill vines 2 weeks prior to harvest if tuber infection threatens; apply protective sprays immediately.',
+    treatment: 'Apply Dimethomorph or Propamocarb systemic fungicides.',
+    organicAlternative: 'Bordeaux mixture (1%) sprayed regularly prior to disease outbreaks.',
+    prevention: [
+      'Plant disease-free certified seed tubers',
+      'Build high soil hills around potato plants to protect tubers from spores',
+      'Destroy volunteers and infected field refuse',
+    ],
+    recoveryTime: '3 weeks',
+  },
+
+  // --- RICE DISEASES ---
+  {
+    id: 'dis_rice_blast',
+    cropName: 'Rice',
+    diseaseName: 'Rice Blast',
+    cause: 'Fungal pathogen Magnaporthe oryzae',
+    severity: 'Critical',
+    symptoms: [
+      'Diamond or spindle-shaped lesions with reddish-brown borders and gray centers',
+      'Lesions enlarge rapidly and girdle leaf sheath or neck collar',
+      'Complete rotting of panicle neck resulting in unfilled empty grains',
+    ],
+    immediateAction: 'Reduce nitrogen application immediately and maintain field water level.',
+    treatment: 'Foliar spray of Tricyclazole 75 WP or Isoprothiolane at panicle initiation.',
+    organicAlternative: 'Spray Pseudomonas fluorescens (10g/L) seed and foliar treatments.',
+    prevention: [
+      'Avoid excess split doses of nitrogenous fertilizers',
+      'Use blast-resistant cultivars suitable for agro-climatic zone',
+      'Perform seed treatment before sowing',
+    ],
+    recoveryTime: '2 to 3 weeks',
+  },
+  {
+    id: 'dis_rice_brown_spot',
+    cropName: 'Rice',
+    diseaseName: 'Brown Spot',
+    cause: 'Fungal pathogen Bipolaris oryzae',
+    severity: 'Medium',
+    symptoms: [
+      'Oval light-brown to dark-brown spots scattered over leaves and glumes',
+      'Spots develop yellow halo and turn grayish in center',
+      'Seedling blight and discolored grain hulls',
+    ],
+    immediateAction: 'Apply recommended soil potassium and micronutrients to relieve plant stress.',
+    treatment: 'Fungicidal spray using Mancozeb or Propiconazole.',
+    organicAlternative: 'Seed treatment with Trichoderma harzianum and foliar neem cake extract.',
+    prevention: [
+      'Correct soil nutrient deficiencies (especially Potassium and Manganese)',
+      'Ensure proper drainage and water management',
+      'Use healthy certified seeds',
+    ],
+    recoveryTime: '1 to 2 weeks',
+  },
+
+  // --- COTTON DISEASES ---
+  {
+    id: 'dis_cotton_bacterial_blight',
+    cropName: 'Cotton',
+    diseaseName: 'Bacterial Blight',
+    cause: 'Bacterium Xanthomonas citri pv. malvacearum',
+    severity: 'High',
+    symptoms: [
+      'Angular water-soaked spots bounded by leaf veins',
+      'Black arm lesions on green bolls and main stems',
+      'Boll rot causing lint staining and premature boll drop',
+    ],
+    immediateAction: 'Prune affected branches and spray bactericide immediately.',
+    treatment: 'Foliar spray of Streptomycin Sulfate + Tetracycline combined with Copper Oxychloride.',
+    organicAlternative: 'Foliar spray of garlic extract mixed with neem seed kernel extract (5%).',
+    prevention: [
+      'Acid delinting of cotton seeds prior to planting',
+      'Use bacterial blight-resistant cotton hybrids',
+      'Remove and burn infected crop stalks after harvest',
+    ],
+    recoveryTime: '2 to 3 weeks',
+  },
+  {
+    id: 'dis_cotton_leaf_curl',
+    cropName: 'Cotton',
+    diseaseName: 'Leaf Curl Virus',
+    cause: 'Cotton Leaf Curl Geminivirus (transmitted by Whitefly Bemisia tabaci)',
+    severity: 'Critical',
+    symptoms: [
+      'Upward or downward curling of leaf margins',
+      'Thickening and darkening of leaf veins with leaf-like enations underneath',
+      'Severe stunting of plants with minimal boll formation',
+    ],
+    immediateAction: 'Apply targeted insecticides to control whitefly vector population immediately.',
+    treatment: 'Spray systemic insecticides such as Imidacloprid or Acetamiprid to manage vectors.',
+    organicAlternative: 'Yellow sticky traps (20-25 traps/acre) and neem oil (10,000 ppm) sprays.',
+    prevention: [
+      'Grow whitefly and virus-resistant cotton varieties',
+      'Keep field borders free from weed hosts',
+      'Avoid close planting and maintain weed sanitation',
+    ],
+    recoveryTime: '3 to 4 weeks (vector control stops spread)',
+  },
+
+  // --- MAIZE DISEASES ---
+  {
+    id: 'dis_maize_common_rust',
+    cropName: 'Maize',
+    diseaseName: 'Common Rust',
+    cause: 'Fungal pathogen Puccinia sorghi',
+    severity: 'Medium',
+    symptoms: [
+      'Small powdery cinnamon-brown pustules on upper and lower leaf surfaces',
+      'Pustules turn brownish-black as plant matures',
+      'Leaf chlorosis and early leaf death under severe attack',
+    ],
+    immediateAction: 'Apply recommended foliar fungicide if rust covers >10% of lower canopy leaves before silking.',
+    treatment: 'Foliar spray of Mancozeb or Tebuconazole.',
+    organicAlternative: 'Foliar bio-fungicide sprays containing Ampelomyces quisqualis or neem formulations.',
+    prevention: [
+      'Plant rust-resistant maize hybrids',
+      'Sow early in season to avoid high humidity peak rust conditions',
+      'Destroy alternative host weeds around maize fields',
+    ],
+    recoveryTime: '2 weeks',
+  },
+  {
+    id: 'dis_maize_leaf_blight',
+    cropName: 'Maize',
+    diseaseName: 'Northern Corn Leaf Blight',
+    cause: 'Fungal pathogen Exserohilum turcicum',
+    severity: 'High',
+    symptoms: [
+      'Long elliptical grayish-green or tan lesions (2 to 15 cm long) on leaves',
+      'Dark dark-spored moldy growth inside lesions during humid weather',
+      'Extensive leaf necrosis leading to grain yield reduction',
+    ],
+    immediateAction: 'Spray targeted protective fungicide to preserve ear leaf and upper foliage.',
+    treatment: 'Fungicide application of Azoxystrobin + Difenoconazole or Propiconazole.',
+    organicAlternative: 'Foliar application of Trichoderma viride combined with fermented cow urine extract.',
+    prevention: [
+      'Adopt minimum 2-year crop rotation with legumes or non-graminaceous crops',
+      'Incorporate maize stubble deeply into soil after harvest',
+      'Select resistant cultivars',
+    ],
+    recoveryTime: '2 to 3 weeks',
+  },
+];
