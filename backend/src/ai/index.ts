@@ -1,8 +1,15 @@
 /**
  * CropGuard AI Engine Foundation Barrel Export
  *
- * Production-Quality Image Preprocessing, Inference, & Post-Processing Pipeline Module.
+ * Production-Quality Image Preprocessing, Inference, Post-Processing,
+ * & Advisory Enrichment Pipeline Module.
  */
+
+// Advisory Services & Generators
+export { AdvisoryEnrichmentService, defaultAdvisoryEnrichmentService } from './advisory/advisoryService.js';
+export { CropGuardNextStepsGenerator, defaultNextStepsGenerator } from './advisory/nextStepsGenerator.js';
+export { RecommendationMerger, defaultRecommendationMerger } from './advisory/recommendationMerger.js';
+export { CropGuardSummaryGenerator, defaultSummaryGenerator } from './advisory/summaryGenerator.js';
 
 // Configuration & Risk Mapping
 export { AI_CONFIG, type AiEngineConfig } from './config/aiConfig.js';
@@ -20,6 +27,16 @@ export {
   PostProcessingError,
   UnsupportedImageFormatError,
 } from './errors/aiErrors.js';
+
+// Advisory Interfaces
+export type {
+  DiseaseKnowledgeData,
+  EnrichedPredictionOutput,
+  IAdvisoryEnrichmentService,
+  INextStepsGenerator,
+  IRecommendationMerger,
+  ISummaryGenerator,
+} from './interfaces/advisory.interface.js';
 
 // Core Interfaces
 export type {

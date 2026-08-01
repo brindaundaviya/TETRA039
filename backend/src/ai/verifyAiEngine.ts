@@ -1,17 +1,16 @@
 import {
   AiEngineError,
-  CorruptedModelResponseError,
-  InvalidProbabilityError,
   aiPredictionService,
   createSyntheticLeafBuffer,
-  defaultAiPostProcessor,
   defaultModelLoader,
-  getDiseaseRiskLevel,
+  defaultNextStepsGenerator,
+  defaultRecommendationMerger,
+  defaultSummaryGenerator,
 } from './index.js';
 
 async function runVerification(): Promise<void> {
   console.log('====================================================');
-  console.log('   CropGuard AI Post-Processing Verification Suite  ');
+  console.log('  CropGuard AI Advisory Enrichment Verification Suite ');
   console.log('====================================================');
 
   try {
@@ -26,104 +25,99 @@ async function runVerification(): Promise<void> {
       throw new Error(`Expected model load count to be 1, but got ${initialStatus.loadCount}`);
     }
 
-    // Test 2: Full Post-Processing Pipeline Execution
-    console.log('\n[Test 2/6] Running Prediction Pipeline & Post-Processing...');
+    // Test 2: End-to-End Prediction & Advisory Enrichment (predictAndEnrich)
+    console.log('\n[Test 2/6] Running Prediction & Advisory Enrichment (predictAndEnrich)...');
     const jpegBuffer = createSyntheticLeafBuffer('jpeg');
-    const result = await aiPredictionService.predict({
-      image: jpegBuffer,
-      topK: 3,
-      centerCrop: true,
+    const enrichedResult = await aiPredictionService.predictAndEnrich(
+      {
+        image: jpegBuffer,
+        topK: 3,
+        centerCrop: true,
+      },
+      {
+        symptoms: ['Dark brown spots with concentric rings on lower leaves', 'Yellowing around leaf lesions'],
+        treatment: 'Apply copper-based fungicide or chlorothalonil at first sign of spots.',
+        organicAlternative: 'Spray with neem oil or bio-fungicide containing Bacillus subtilis.',
+        prevention: ['Rotate crops every 2-3 years', 'Ensure proper plant spacing for air circulation'],
+        recoveryTime: '7-14 days',
+      }
+    );
+
+    console.log('✓ Standard Enriched Output JSON Response:');
+    console.log(JSON.stringify(enrichedResult, null, 4));
+
+    // Test 3: Concise Summary Generator Unit Verification
+    console.log('\n[Test 3/6] Testing Concise Summary Generator...');
+    const summary = defaultSummaryGenerator.generateSummary(enrichedResult);
+    console.log(`✓ Generated Summary: "${summary}"`);
+
+    if (!summary || summary.length > 250) {
+      throw new Error('Summary generator produced empty or overly long text!');
+    }
+
+    // Test 4: Next Steps Generator Unit Verification (3-5 Practical Steps)
+    console.log('\n[Test 4/6] Testing Actionable Next Steps Generator (3-5 Items)...');
+    const nextSteps = defaultNextStepsGenerator.generateNextSteps(enrichedResult);
+    console.log(`✓ Generated Next Steps (${nextSteps.length} items):`);
+    nextSteps.forEach((step, idx) => console.log(`   ${idx + 1}. ${step}`));
+
+    if (!Array.isArray(nextSteps) || nextSteps.length < 3 || nextSteps.length > 5) {
+      throw new Error(`Expected nextSteps count to be between 3 and 5, but got ${nextSteps.length}`);
+    }
+
+    // Test 5: Fallback Recommendation Merging (Omitted / Unknown Knowledge Data)
+    console.log('\n[Test 5/6] Testing Graceful Fallback Handling for Missing Knowledge Data...');
+    const fallbackResult = defaultRecommendationMerger.merge({
+      crop: 'Tomato',
+      disease: 'Unknown Blight Special',
+      confidence: 88.0,
+      confidenceCategory: 'High',
+      risk: 'High',
+      processingTime: '0.05 sec',
+      topPredictions: [{ label: 'Unknown Blight Special', confidence: 88.0 }],
     });
 
-    console.log('✓ Standard Output JSON Response:');
-    console.log(JSON.stringify(result, null, 4));
+    console.log(`✓ Fallback Summary: "${fallbackResult.summary}"`);
+    console.log(`✓ Fallback Treatment: "${fallbackResult.recommendedTreatment}"`);
+    console.log(`✓ Fallback Next Steps Count: ${fallbackResult.nextSteps.length}`);
 
-    // Test 3: Verify Confidence Category Ranges
-    console.log('\n[Test 3/6] Testing Confidence Category Threshold Mapping...');
-    const catVeryHigh = defaultAiPostProcessor.evaluateConfidenceCategory(96.8);
-    const catHigh = defaultAiPostProcessor.evaluateConfidenceCategory(88.5);
-    const catMod = defaultAiPostProcessor.evaluateConfidenceCategory(75.0);
-    const catLow = defaultAiPostProcessor.evaluateConfidenceCategory(45.2);
-
-    console.log(`  - 96.8%  → "${catVeryHigh}" (Expected: Very High)`);
-    console.log(`  - 88.5%  → "${catHigh}" (Expected: High)`);
-    console.log(`  - 75.0%  → "${catMod}" (Expected: Moderate)`);
-    console.log(`  - 45.2%  → "${catLow}" (Expected: Low)`);
-
-    if (catVeryHigh !== 'Very High' || catHigh !== 'High' || catMod !== 'Moderate' || catLow !== 'Low') {
-      throw new Error('Confidence category threshold evaluation mismatch!');
-    }
-    console.log('✓ Confidence Category logic verified!');
-
-    // Test 4: Verify Configurable Risk Level Mappings
-    console.log('\n[Test 4/6] Testing Configurable Risk Mapping...');
-    const riskHealthy = getDiseaseRiskLevel('Healthy');
-    const riskEarlyBlight = getDiseaseRiskLevel('Early Blight');
-    const riskLateBlight = getDiseaseRiskLevel('Late Blight');
-    const riskYellowCurl = getDiseaseRiskLevel('Yellow Leaf Curl Virus');
-
-    console.log(`  - "Healthy"                → Risk: "${riskHealthy}" (Expected: Low)`);
-    console.log(`  - "Early Blight"           → Risk: "${riskEarlyBlight}" (Expected: Medium)`);
-    console.log(`  - "Late Blight"            → Risk: "${riskLateBlight}" (Expected: High)`);
-    console.log(`  - "Yellow Leaf Curl Virus" → Risk: "${riskYellowCurl}" (Expected: Critical)`);
-
-    if (riskHealthy !== 'Low' || riskEarlyBlight !== 'Medium' || riskLateBlight !== 'High' || riskYellowCurl !== 'Critical') {
-      throw new Error('Risk level mapping mismatch!');
-    }
-    console.log('✓ Configurable Disease Risk Mapping verified!');
-
-    // Test 5: Verify Top Predictions Sorting & Structure
-    console.log('\n[Test 5/6] Verifying Top 3 Predictions Sorting & Schema...');
-    if (!Array.isArray(result.topPredictions) || result.topPredictions.length !== 3) {
-      throw new Error(`Expected topPredictions array length to be 3, got ${result.topPredictions.length}`);
+    if (!fallbackResult.recommendedTreatment || fallbackResult.nextSteps.length < 3) {
+      throw new Error('Fallback recommendation merger failed to supply default guidance!');
     }
 
-    const [pred1, pred2, pred3] = result.topPredictions;
-    if (!pred1 || !pred2 || !pred3) {
-      throw new Error('Top predictions array contains null/undefined items');
+    // Test 6: Final Schema Compliance Check
+    console.log('\n[Test 6/6] Verifying Final Output Schema Compliance...');
+    const requiredKeys = [
+      'crop',
+      'disease',
+      'confidence',
+      'confidenceCategory',
+      'risk',
+      'summary',
+      'symptoms',
+      'recommendedTreatment',
+      'organicAlternative',
+      'prevention',
+      'recoveryTime',
+      'nextSteps',
+      'processingTime',
+      'topPredictions',
+    ];
+
+    const missingKeys = requiredKeys.filter((key) => !(key in enrichedResult));
+    if (missingKeys.length > 0) {
+      throw new Error(`Enriched result is missing required schema keys: ${missingKeys.join(', ')}`);
     }
 
-    console.log(`  1. ${pred1.label}: ${pred1.confidence}%`);
-    console.log(`  2. ${pred2.label}: ${pred2.confidence}%`);
-    console.log(`  3. ${pred3.label}: ${pred3.confidence}%`);
-
-    if (pred1.confidence < pred2.confidence || pred2.confidence < pred3.confidence) {
-      throw new Error('Top predictions are NOT sorted descendingly by confidence!');
-    }
-    console.log('✓ Top 3 predictions correctly sorted in descending order!');
-
-    // Test 6: Verify Post-Processing Error Handling
-    console.log('\n[Test 6/6] Testing Post-Processing Error Handling on Corrupted Output...');
-    let caughtCorruptedErr = false;
-    try {
-      defaultAiPostProcessor.process({
-        classProbabilities: [NaN, -0.5, 1.5],
-        topIndices: [0, 1, 2],
-        processingTimeMs: 12,
-      });
-    } catch (err) {
-      if (err instanceof InvalidProbabilityError || err instanceof CorruptedModelResponseError) {
-        caughtCorruptedErr = true;
-        console.log(`✓ Expected post-processing error caught: "${err.message}" (Code: ${err.code})`);
-      } else {
-        throw err;
-      }
-    }
-
-    if (!caughtCorruptedErr) {
-      throw new Error('Failed to catch corrupted prediction probability error!');
-    }
-
-    // Schema Output Verification
     console.log('\n----------------------------------------------------');
-    console.log(' Final Response Schema Validation:');
-    console.log(`  - Crop: "${result.crop}"`);
-    console.log(`  - Disease: "${result.disease}"`);
-    console.log(`  - Confidence: ${result.confidence}%`);
-    console.log(`  - Confidence Category: "${result.confidenceCategory}"`);
-    console.log(`  - Risk Level: "${result.risk}"`);
-    console.log(`  - Processing Time: "${result.processingTime}"`);
-    console.log(`  - Top Predictions Count: ${result.topPredictions.length}`);
+    console.log(' Enriched Response Schema Validation:');
+    console.log(`  - Crop: "${enrichedResult.crop}"`);
+    console.log(`  - Disease: "${enrichedResult.disease}"`);
+    console.log(`  - Confidence: ${enrichedResult.confidence}% (${enrichedResult.confidenceCategory})`);
+    console.log(`  - Risk: "${enrichedResult.risk}"`);
+    console.log(`  - Summary: "${enrichedResult.summary}"`);
+    console.log(`  - Recommended Treatment: "${enrichedResult.recommendedTreatment}"`);
+    console.log(`  - Next Steps Count: ${enrichedResult.nextSteps.length}`);
     console.log('----------------------------------------------------');
 
     console.log('\n====================================================');

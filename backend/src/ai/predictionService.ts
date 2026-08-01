@@ -1,7 +1,13 @@
 import { AI_CONFIG } from './config/aiConfig.js';
+import { defaultAdvisoryEnrichmentService } from './advisory/advisoryService.js';
 import { AiEngineError } from './errors/aiErrors.js';
 import { defaultResponseFormatter } from './formatting/responseFormatter.js';
 import { defaultInferenceEngine } from './inference/predictionPipeline.js';
+import type {
+  DiseaseKnowledgeData,
+  EnrichedPredictionOutput,
+  IAdvisoryEnrichmentService,
+} from './interfaces/advisory.interface.js';
 import type {
   IImagePreprocessor,
   IInferenceEngine,
@@ -20,17 +26,20 @@ export class AiPredictionService {
   private readonly modelLoader: IModelLoader;
   private readonly inferenceEngine: IInferenceEngine;
   private readonly formatter: IResponseFormatter;
+  private readonly advisoryService: IAdvisoryEnrichmentService;
 
   constructor(
     preprocessor: IImagePreprocessor = defaultImagePreprocessor,
     modelLoader: IModelLoader = defaultModelLoader,
     inferenceEngine: IInferenceEngine = defaultInferenceEngine,
-    formatter: IResponseFormatter = defaultResponseFormatter
+    formatter: IResponseFormatter = defaultResponseFormatter,
+    advisoryService: IAdvisoryEnrichmentService = defaultAdvisoryEnrichmentService
   ) {
     this.preprocessor = preprocessor;
     this.modelLoader = modelLoader;
     this.inferenceEngine = inferenceEngine;
     this.formatter = formatter;
+    this.advisoryService = advisoryService;
   }
 
   /**
@@ -42,11 +51,6 @@ export class AiPredictionService {
 
   /**
    * Run production AI prediction pipeline on an input crop leaf image.
-   * Execution Flow:
-   * 1. Validate Image (File exists, JPG/JPEG/PNG format check, corrupted buffer check).
-   * 2. Preprocess Image (EXIF orientation, strip alpha RGBA->RGB, center crop, resize to 224x224, normalize).
-   * 3. Run Inference (Reuse single loaded model instance, compute Wx+b logits, softmax).
-   * 4. Post-Process & Format Predictions (Validate probabilities, calculate top 3, assign risk & confidenceCategory).
    *
    * @param options Image buffer or Base64 string, or PredictionInputOptions object
    * @returns StandardPredictionOutput matching exact CropGuard AI JSON specification
@@ -87,6 +91,17 @@ export class AiPredictionService {
       }
       throw err;
     }
+  }
+
+  /**
+   * Run prediction pipeline and enrich with agricultural advice and next steps.
+   */
+  public async predictAndEnrich(
+    options: ImageInput | PredictionInputOptions,
+    knowledgeData?: DiseaseKnowledgeData
+  ): Promise<EnrichedPredictionOutput> {
+    const basePrediction = await this.predict(options);
+    return this.advisoryService.enrich(basePrediction, knowledgeData);
   }
 
   /**
