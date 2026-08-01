@@ -1,7 +1,7 @@
 /**
  * Custom Error Hierarchy for CropGuard AI Engine.
  * Provides explicit, meaningful error types for image validation, model loading,
- * and inference runtime failures.
+ * inference execution, and post-processing failures.
  */
 
 export abstract class AiEngineError extends Error {
@@ -53,5 +53,29 @@ export class InferenceExecutionError extends AiEngineError {
 
   constructor(reason: string) {
     super(`AI inference execution failed: ${reason}`, 500);
+  }
+}
+
+export class PostProcessingError extends AiEngineError {
+  public readonly code = 'POST_PROCESSING_ERROR';
+
+  constructor(reason: string) {
+    super(`AI post-processing failed: ${reason}`, 500);
+  }
+}
+
+export class InvalidProbabilityError extends AiEngineError {
+  public readonly code = 'INVALID_PROBABILITY_ERROR';
+
+  constructor(reason: string) {
+    super(`Invalid prediction probability vector: ${reason}`, 500);
+  }
+}
+
+export class CorruptedModelResponseError extends AiEngineError {
+  public readonly code = 'CORRUPTED_MODEL_RESPONSE';
+
+  constructor(reason = 'Inference engine emitted empty or unparseable prediction scores.') {
+    super(reason, 500);
   }
 }

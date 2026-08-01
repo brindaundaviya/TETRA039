@@ -4,12 +4,25 @@
  */
 
 /**
+ * Confidence Category ranges:
+ * 95–100%: "Very High"
+ * 85–94%: "High"
+ * 70–84%: "Moderate"
+ * Below 70%: "Low"
+ */
+export type ConfidenceCategory = 'Very High' | 'High' | 'Moderate' | 'Low';
+
+/**
+ * Severity Risk Levels mapped to disease conditions.
+ */
+export type RiskLevel = 'Low' | 'Medium' | 'High' | 'Critical';
+
+/**
  * Standard prediction result item in top predictions array.
- * Includes 'label' as specified in output schema (and optional 'name' for backward compatibility).
  */
 export interface TopPredictionItem {
   label: string;
-  name?: string;
+  name?: string; // Backwards compatibility
   confidence: number;
 }
 
@@ -20,8 +33,10 @@ export interface StandardPredictionOutput {
   crop: string;
   disease: string;
   confidence: number;
-  topPredictions: TopPredictionItem[];
+  confidenceCategory: ConfidenceCategory;
+  risk: RiskLevel;
   processingTime: string;
+  topPredictions: TopPredictionItem[];
 }
 
 /**

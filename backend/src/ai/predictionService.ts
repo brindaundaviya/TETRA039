@@ -46,7 +46,7 @@ export class AiPredictionService {
    * 1. Validate Image (File exists, JPG/JPEG/PNG format check, corrupted buffer check).
    * 2. Preprocess Image (EXIF orientation, strip alpha RGBA->RGB, center crop, resize to 224x224, normalize).
    * 3. Run Inference (Reuse single loaded model instance, compute Wx+b logits, softmax).
-   * 4. Decode & Format Predictions (Map class IDs to crop/disease, calculate topK, format processing time).
+   * 4. Post-Process & Format Predictions (Validate probabilities, calculate top 3, assign risk & confidenceCategory).
    *
    * @param options Image buffer or Base64 string, or PredictionInputOptions object
    * @returns StandardPredictionOutput matching exact CropGuard AI JSON specification
@@ -77,7 +77,7 @@ export class AiPredictionService {
       // Step 3: Run Model Forward Pass & Raw Inference (Model is loaded ONCE & reused)
       const rawOutput = await this.inferenceEngine.predict(tensor);
 
-      // Step 4: Decode predictions & format standard JSON response
+      // Step 4: Post-process predictions & format standard JSON response
       const result = this.formatter.format(rawOutput, topK);
 
       return result;
