@@ -52,10 +52,10 @@ export function EmptyState({ onSeedData, isFilteredEmpty = false, onResetFilters
       {/* Messaging */}
       <div className="max-w-md mx-auto space-y-2">
         <h3 className="text-2xl font-extrabold text-white tracking-tight">
-          Start your first AI detection
+          Start your first field scan
         </h3>
         <p className="text-sm text-slate-400 leading-relaxed">
-          Scan your crop foliage using CropGuard AI to classify diseases, view confidence ratings, and generate localized treatment protocols.
+          Take a clear photo of a leaf to check disease, severity, and what to do next.
         </p>
       </div>
 
@@ -66,14 +66,14 @@ export function EmptyState({ onSeedData, isFilteredEmpty = false, onResetFilters
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Run New AI Detection
+            Start a new scan
           </Button>
         </Link>
         <Button variant="outline" size="md" onClick={onSeedData} className="gap-2">
           <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
           </svg>
-          Load Demo Sample Records
+          Load sample records
         </Button>
       </div>
     </div>

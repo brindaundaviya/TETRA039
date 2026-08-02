@@ -10,6 +10,7 @@ import { HowItWorksSection } from './components/HowItWorksSection';
 import { StatsSection } from './components/StatsSection';
 import { FAQSection } from './components/FAQSection';
 import { FooterSection } from './components/FooterSection';
+import { FloatingScanButton } from '@/components/layout/FloatingScanButton';
 
 export function LandingPage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -47,7 +48,6 @@ export function LandingPage() {
               <span className="text-xl font-bold tracking-tight text-white group-hover:text-primary-300 transition-colors">
                 {APP_NAME} <span className="text-primary-400">AI</span>
               </span>
-              <span className="text-[10px] font-mono text-emerald-400">TETRA039</span>
             </div>
           </Link>
 
@@ -183,6 +183,7 @@ export function LandingPage() {
 
       {/* Footer */}
       <FooterSection />
+      <FloatingScanButton />
 
     </div>
   );

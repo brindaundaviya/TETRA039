@@ -3,42 +3,42 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 const TIMELINE_STEPS = [
   {
     step: '1',
-    title: 'Upload Received',
-    time: '+0 ms',
-    description: 'Leaf photograph validated for minimum resolution, RGB channels, and file format.',
-    status: 'Complete',
+    title: 'Photo received',
+    time: 'Step 1',
+    description: 'The leaf photo is checked for a clear view and good lighting.',
+    status: 'Done',
     iconBg: 'bg-emerald-500/20 text-emerald-400',
   },
   {
     step: '2',
-    title: 'Image Preprocessing',
-    time: '+110 ms',
-    description: 'Resized to 512x512 matrix, contrast enhanced, and lesion region segmented.',
-    status: 'Complete',
+    title: 'Leaf pattern reviewed',
+    time: 'Step 2',
+    description: 'The image is reviewed for spots, color changes, and damaged areas.',
+    status: 'Done',
     iconBg: 'bg-emerald-500/20 text-emerald-400',
   },
   {
     step: '3',
-    title: 'AI Neural Net Analysis',
-    time: '+280 ms',
-    description: 'Deep convolutional layers extract cellular spots, chlorosis, and margin decay.',
-    status: 'Complete',
+    title: 'Possible disease matched',
+    time: 'Step 3',
+    description: 'The scan looks for the disease that best matches the symptoms.',
+    status: 'Done',
     iconBg: 'bg-emerald-500/20 text-emerald-400',
   },
   {
     step: '4',
-    title: 'Disease Classification',
-    time: '+390 ms',
-    description: 'Matched against 100K+ agricultural leaf pathology training set.',
-    status: 'Complete',
+    title: 'Severity checked',
+    time: 'Step 4',
+    description: 'The condition is grouped as low, medium, or high risk to guide action.',
+    status: 'Done',
     iconBg: 'bg-emerald-500/20 text-emerald-400',
   },
   {
     step: '5',
-    title: 'Recommendation Generated',
-    time: '+420 ms',
-    description: 'Curated organic, chemical, and field management advisory constructed.',
-    status: 'Complete',
+    title: 'Advice prepared',
+    time: 'Step 5',
+    description: 'The app prepares simple steps for treatment and follow-up.',
+    status: 'Done',
     iconBg: 'bg-primary-500/20 text-primary-400',
   },
 ];
@@ -51,9 +51,9 @@ export function PredictionTimeline() {
           <svg className="w-5 h-5 text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          Inference Pipeline Timeline
+          What happened in this scan
         </CardTitle>
-        <CardDescription>Sub-500ms vision model processing execution log</CardDescription>
+        <CardDescription>A simple summary of the check behind the advice.</CardDescription>
       </CardHeader>
 
       <CardContent className="p-6">

@@ -41,9 +41,7 @@ export function FooterSection() {
             </p>
 
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg glass border border-primary-500/30 text-xs font-mono text-primary-300">
-              <span>National Hackathon Project</span>
-              <span className="text-white/30">•</span>
-              <span className="text-white font-bold">Team TETRA039</span>
+              <span>Simple crop care support</span>
             </div>
           </div>
 
@@ -105,12 +103,6 @@ export function FooterSection() {
                   Detection Scan History
                 </Link>
               </li>
-              <li>
-                <Link to={ROUTES.ABOUT} className="hover:text-primary-400 transition-colors flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
-                  About Team TETRA039
-                </Link>
-              </li>
             </ul>
 
             {/* GitHub Placeholder Link */}
@@ -133,7 +125,7 @@ export function FooterSection() {
 
         {/* Footer Bottom Copyright Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© {currentYear} CropGuard AI. Designed for National Hackathon by Team TETRA039. All rights reserved.</p>
+          <p>© {currentYear} CropGuard AI. Simple field support for farmers.</p>
           
           <button
             onClick={scrollToTop}

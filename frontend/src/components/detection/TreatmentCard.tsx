@@ -14,88 +14,58 @@ interface TreatmentCardProps {
 }
 
 export function TreatmentCard({ treatment }: TreatmentCardProps) {
-  const getPriorityBadge = (priority: TreatmentDetails['priorityLevel']) => {
-    switch (priority) {
-      case 'High Priority':
-        return 'bg-red-500/10 border-red-500/30 text-red-400';
-      case 'Medium Priority':
-        return 'bg-amber-500/10 border-amber-500/30 text-amber-400';
-      case 'Standard Care':
-        return 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400';
-    }
-  };
+  const detailRows = [
+    { label: 'Product', value: treatment.recommendedTreatment },
+    { label: 'Dosage', value: treatment.chemicalSolution },
+    { label: 'When to Spray', value: 'Early morning, before 10 AM' },
+    { label: 'How Often', value: 'Every 5–7 days while symptoms remain' },
+    { label: 'Safety', value: 'Wear gloves and keep away from children' },
+  ];
 
   return (
-    <Card className="p-0 border border-white/10 overflow-hidden mb-6">
-      <CardHeader className="p-6 pb-4 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
-            <svg className="w-5 h-5 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-            </svg>
-            Agronomic Treatment Advisory
-          </CardTitle>
-          <CardDescription>Curated remedies & crop recovery guidelines</CardDescription>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-mono text-slate-400">
-            Est. Recovery: <span className="text-white font-bold">{treatment.recoveryTime}</span>
-          </span>
-          <span className={`px-3 py-1 rounded-full text-xs font-mono border font-semibold ${getPriorityBadge(treatment.priorityLevel)}`}>
+    <Card className="overflow-hidden border border-white/10 p-0">
+      <CardHeader className="border-b border-white/5 p-5">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <CardTitle className="flex items-center gap-2 text-lg font-bold text-white">
+              <span className="text-xl">🧪</span>
+              Recommended Spray
+            </CardTitle>
+            <CardDescription className="mt-1 text-sm text-slate-300">Simple steps you can follow today.</CardDescription>
+          </div>
+          <span className="rounded-full border border-primary-500/30 bg-primary-500/10 px-2.5 py-1 text-xs font-semibold text-primary-300">
             {treatment.priorityLevel}
           </span>
         </div>
       </CardHeader>
 
-      <CardContent className="p-6 space-y-4">
-        
-        {/* Immediate Action Banner */}
-        <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/20 space-y-1">
-          <div className="flex items-center gap-2 text-xs font-bold text-red-400 uppercase tracking-wider">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-            Immediate Action Required
-          </div>
-          <p className="text-xs sm:text-sm text-slate-200 leading-relaxed font-medium">
-            {treatment.immediateAction}
-          </p>
+      <CardContent className="space-y-4 p-5">
+        <div className="rounded-2xl border border-red-500/20 bg-red-500/10 p-4">
+          <div className="text-sm font-semibold text-red-300">🚨 Act today</div>
+          <p className="mt-1 text-sm text-slate-200">{treatment.immediateAction}</p>
         </div>
 
-        {/* Recommended Primary Treatment */}
-        <div className="p-4 rounded-2xl glass border border-white/5 space-y-1">
-          <div className="text-xs font-bold text-primary-400 uppercase tracking-wider">
-            Recommended Primary Treatment
-          </div>
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            {treatment.recommendedTreatment}
-          </p>
-        </div>
-
-        {/* Dual Solutions Grid: Organic vs Chemical */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Organic Solution */}
-          <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 space-y-1">
-            <div className="flex items-center gap-2 text-xs font-bold text-emerald-400 uppercase tracking-wider">
-              🌱 Organic / Bio Solution
-            </div>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              {treatment.organicSolution}
-            </p>
+        <div className="grid gap-4 lg:grid-cols-2">
+          <div className="rounded-[1.25rem] border border-sky-500/20 bg-sky-500/10 p-4">
+            <div className="text-sm font-semibold text-sky-300">🧴 Chemical Option</div>
+            <ul className="mt-3 space-y-2 text-sm text-slate-200">
+              {detailRows.map((row) => (
+                <li key={row.label} className="leading-relaxed">
+                  <span className="font-semibold text-white">{row.label}:</span> {row.value}
+                </li>
+              ))}
+            </ul>
           </div>
 
-          {/* Chemical Solution */}
-          <div className="p-4 rounded-2xl bg-sky-500/10 border border-sky-500/20 space-y-1">
-            <div className="flex items-center gap-2 text-xs font-bold text-sky-400 uppercase tracking-wider">
-              🧪 Targeted Chemical Spray
-            </div>
-            <p className="text-xs text-slate-300 leading-relaxed">
-              {treatment.chemicalSolution}
-            </p>
+          <div className="rounded-[1.25rem] border border-emerald-500/20 bg-emerald-500/10 p-4">
+            <div className="text-sm font-semibold text-emerald-300">🌱 Organic Alternative</div>
+            <ul className="mt-3 space-y-2 text-sm text-slate-200">
+              <li><span className="font-semibold text-white">Product:</span> {treatment.organicSolution}</li>
+              <li><span className="font-semibold text-white">When:</span> Early morning, repeat after 5–7 days</li>
+              <li><span className="font-semibold text-white">Why:</span> Helps protect nearby leaves without harsh chemicals</li>
+            </ul>
           </div>
         </div>
-
       </CardContent>
     </Card>
   );

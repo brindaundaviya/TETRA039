@@ -53,8 +53,8 @@ export function PredictionDetailModal({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="AI Prediction Classification Report"
-      description={`Record ID: ${prediction.id}`}
+      title="Field scan report"
+      description={`Saved scan record ${prediction.id}`}
       size="lg"
     >
       <div className="space-y-6 max-h-[75vh] overflow-y-auto pr-1">
@@ -69,8 +69,8 @@ export function PredictionDetailModal({
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-80" />
             <div className="absolute bottom-2 left-2 right-2 flex justify-between items-center text-[10px] font-mono text-slate-300">
-              <span>Vision Input Matrix</span>
-              <span>HD 1080p</span>
+              <span>Field photo</span>
+              <span>Clear view</span>
             </div>
           </div>
 
@@ -95,7 +95,7 @@ export function PredictionDetailModal({
             {/* Confidence Score Bar */}
             <div className="p-3 rounded-xl bg-slate-950/60 border border-white/10 space-y-1.5">
               <div className="flex justify-between items-center text-xs font-medium">
-                <span className="text-slate-400">Statistical AI Certainty Score</span>
+                <span className="text-slate-400">Confidence score</span>
                 <span className="font-mono text-primary-400 font-bold text-sm">
                   {formatPercentage(prediction.confidence)}
                 </span>
@@ -111,13 +111,13 @@ export function PredictionDetailModal({
             {/* Technical Parameters */}
             <div className="grid grid-cols-2 gap-2 text-xs font-mono text-slate-400 pt-1">
               <div className="p-2 rounded-lg bg-white/5 border border-white/5">
-                <span className="block text-[10px] text-slate-500">DETECTED AT</span>
+                <span className="block text-[10px] text-slate-500">CHECKED ON</span>
                 <span className="text-slate-200 text-[11px]">
                   {formatDate(prediction.timestamp)}
                 </span>
               </div>
               <div className="p-2 rounded-lg bg-white/5 border border-white/5">
-                <span className="block text-[10px] text-slate-500">MODEL VERSION</span>
+                <span className="block text-[10px] text-slate-500">SCAN VERSION</span>
                 <span className="text-emerald-400 font-semibold text-[11px]">
                   {prediction.modelVersion || 'CropGuard-Vision-v2.4'}
                 </span>
@@ -132,7 +132,7 @@ export function PredictionDetailModal({
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            Treatment Summary & Agronomic Recommendation
+            What to do next
           </div>
           <p className="text-sm text-slate-200 leading-relaxed">
             {prediction.recommendation}
@@ -170,7 +170,7 @@ export function PredictionDetailModal({
               <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
               </svg>
-              Preventive Measures & Field Protocols
+              Extra care for the field
             </h4>
             <ul className="space-y-2">
               {prediction.prevention.map((measure, idx) => (

@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui';
 import type { DetectionErrorState } from '@/types';
+import { t } from '@/utils/translations';
 
 interface ErrorCardProps {
   error: DetectionErrorState;
@@ -54,40 +55,32 @@ export function ErrorCard({ error, onRetry, onDismiss }: ErrorCardProps) {
   const theme = getCategoryTheme();
 
   return (
-    <div className={`p-6 rounded-3xl glass border ${theme.bg} mb-6 relative overflow-hidden transition-all duration-300 animate-in fade-in`}>
+    <div className={`mb-6 overflow-hidden rounded-[1.75rem] border p-6 ${theme.bg} transition-all duration-300`}>
       <div className="flex items-start gap-4">
-        <div className="w-12 h-12 rounded-2xl glass flex items-center justify-center flex-shrink-0">
+        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-slate-950/70">
           {theme.icon}
         </div>
 
-        <div className="flex-1 space-y-1">
-          <div className="flex items-center justify-between">
-            <h4 className="text-base font-bold text-white tracking-tight">
-              {error.title}
-            </h4>
-            <span className="text-[10px] font-mono uppercase tracking-wider px-2 py-0.5 rounded bg-white/5 border border-white/10">
+        <div className="flex-1 space-y-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+            <h4 className="text-lg font-bold text-white">{error.title}</h4>
+            <span className="rounded-full border border-white/10 bg-white/5 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-slate-300">
               {error.category}
             </span>
           </div>
 
-          <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-            {error.message}
-          </p>
+          <p className="text-sm leading-relaxed text-slate-300">{error.message}</p>
 
-          {error.details && (
-            <p className="text-[11px] font-mono text-slate-400 pt-1">
-              {error.details}
-            </p>
-          )}
+          {error.details && <p className="text-sm text-slate-400">{error.details}</p>}
 
-          <div className="pt-4 flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3 pt-2">
             {onRetry && (
               <Button size="sm" variant="primary" onClick={onRetry}>
-                Retry Analysis
+                Try Again
               </Button>
             )}
             <Button size="sm" variant="ghost" onClick={onDismiss} className="text-slate-300 hover:text-white">
-              Dismiss
+              {t('scan.seeMore')}
             </Button>
           </div>
         </div>

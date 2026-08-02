@@ -11,25 +11,24 @@ export function HeaderSection() {
         <div className="space-y-2 max-w-3xl">
           <div className="flex items-center gap-3">
             <span className="px-3 py-1 rounded-full glass border border-primary-500/30 text-xs font-mono text-primary-300 shadow-glow">
-              Computer Vision Model v2.4
+              Simple field scan
             </span>
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs text-slate-400 font-mono">Tetrathon 2026 · Team TETRA039</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight flex items-center gap-3">
-            <span>🌿</span> AI Crop Disease <span className="gradient-text">Detection</span>
+            <span>🌿</span> Check crop disease in <span className="gradient-text">minutes</span>
           </h1>
 
           <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-            Upload a crop leaf image and receive an instant, AI-powered disease diagnosis with precision confidence ratings and actionable treatment advisories.
+            Take a photo of a leaf and get a clear result with the likely disease, severity, and what to do next.
           </p>
         </div>
 
         {/* Status Indicator */}
         <div className="flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-2xl glass border border-white/10 text-xs font-mono text-slate-300">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping" />
-          <span>GPU Vision Engine Ready</span>
+          <span>Ready to scan</span>
         </div>
 
       </div>

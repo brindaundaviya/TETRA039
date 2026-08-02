@@ -20,9 +20,9 @@ export function WelcomeHeader() {
 
   const quotes = [
     'Healthy crops today ensure a prosperous harvest tomorrow.',
-    'Early disease detection saves yields and secures agricultural futures.',
-    'Precision farming guided by artificial intelligence.',
-    'Empowering sustainable agriculture with computer vision technology.',
+    'A quick scan today can protect your field tomorrow.',
+    'Simple checks now can save time, water, and harvest.',
+    'Small actions today lead to stronger crops later.',
   ];
   // Select a quote deterministically based on day of month
   const todayQuote = quotes[new Date().getDate() % quotes.length];
@@ -39,34 +39,34 @@ export function WelcomeHeader() {
         {/* Left Welcome Message & Date */}
         <div className="space-y-2 max-w-2xl">
           <div className="flex items-center gap-3">
-            <span className="px-3 py-1 rounded-full glass border border-primary-500/30 text-xs font-mono text-primary-300 shadow-glow">
+            <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-300">
               {formattedDate}
             </span>
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs text-slate-400 font-mono">CropGuard Monitor Active</span>
+            <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-400" />
+            <span className="text-xs font-medium text-slate-400">Field support ready</span>
           </div>
 
-          <h1 className="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-            {timeGreeting}, Farmer <span className="inline-block animate-bounce">👋</span>
+          <h1 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-white">
+            {timeGreeting}, Farmer <span className="ml-1 inline-block animate-bounce">👋</span>
           </h1>
 
-          <p className="text-slate-300 text-sm sm:text-base italic leading-relaxed flex items-center gap-2">
-            <svg className="w-4 h-4 text-primary-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+          <p className="flex items-center gap-2 text-sm leading-relaxed text-slate-300 sm:text-base">
+            <svg className="h-4 w-4 flex-shrink-0 text-primary-400" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z" clipRule="evenodd" />
             </svg>
-            "{todayQuote}"
+            “{todayQuote}”
           </p>
         </div>
 
         {/* Right CTA Button */}
         <div className="flex-shrink-0 w-full sm:w-auto">
           <Link to={ROUTES.DETECTION} className="w-full sm:w-auto block">
-            <Button size="lg" className="w-full sm:w-auto px-6 py-3.5 shadow-glow font-semibold group/btn">
+            <Button size="lg" className="w-full sm:w-auto px-6 py-3.5 font-semibold shadow-glow group/btn">
               <svg className="w-5 h-5 group-hover/btn:scale-110 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
-              <span>Start Disease Detection</span>
+              <span>Scan Crop</span>
             </Button>
           </Link>
         </div>

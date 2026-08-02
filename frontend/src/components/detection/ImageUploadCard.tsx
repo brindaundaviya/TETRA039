@@ -1,5 +1,6 @@
 import { useState, useRef, type ChangeEvent, type DragEvent } from 'react';
 import { Button, Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui';
+import { t } from '@/utils/translations';
 
 interface SamplePreset {
   id: string;
@@ -84,26 +85,26 @@ export function ImageUploadCard({
   };
 
   return (
-    <Card className="p-0 border border-white/10 overflow-hidden mb-6">
-      <CardHeader className="p-6 pb-4 border-b border-white/5">
-        <div className="flex items-center justify-between">
+    <Card className="mb-0 overflow-hidden border border-white/10 p-0">
+      <CardHeader className="border-b border-white/5 p-4 sm:p-5 pb-3">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <CardTitle className="text-xl font-bold text-white flex items-center gap-2">
-              <svg className="w-5 h-5 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <CardTitle className="flex items-center gap-2 text-2xl font-bold text-white">
+              <svg className="h-6 w-6 text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              Upload Leaf Image
+              {t('scan.title')}
             </CardTitle>
-            <CardDescription>Select or drop a clear photo of the crop leaf</CardDescription>
+            <CardDescription className="mt-1 text-base text-slate-300">{t('scan.subtitle')}</CardDescription>
           </div>
 
-          <span className="px-3 py-1 rounded-full glass text-xs font-mono text-emerald-400 border border-emerald-500/30">
+          <span className="rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3 py-1 text-sm font-semibold text-emerald-300">
             Max 5 MB
           </span>
         </div>
       </CardHeader>
 
-      <CardContent className="p-6 space-y-6">
+      <CardContent className="space-y-4 p-4 sm:p-5">
         
         {/* Hidden File Input */}
         <input
@@ -114,45 +115,54 @@ export function ImageUploadCard({
           className="hidden"
         />
 
-        {/* Drag & Drop or Preview Area */}
         {!selectedImage ? (
-          <div
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            onClick={() => fileInputRef.current?.click()}
-            className={`border-2 border-dashed rounded-3xl p-8 sm:p-12 text-center transition-all duration-300 cursor-pointer relative overflow-hidden group ${
-              isDragging
-                ? 'border-primary-400 bg-primary-500/10 shadow-glow scale-[0.99]'
-                : 'border-white/15 hover:border-primary-500/40 bg-surface-50/40 hover:bg-white/[0.03]'
-            }`}
-          >
-            <div className="w-16 h-16 mx-auto rounded-2xl glass flex items-center justify-center text-primary-400 mb-4 group-hover:scale-110 transition-transform">
-              <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-              </svg>
+          <div className="space-y-5">
+            <div
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              onClick={() => fileInputRef.current?.click()}
+              className={`cursor-pointer overflow-hidden rounded-[1.5rem] border-2 border-dashed p-6 text-center transition-all duration-300 sm:p-8 ${
+                isDragging
+                  ? 'scale-[0.99] border-primary-400 bg-primary-500/10 shadow-glow'
+                  : 'border-white/15 bg-slate-900/50 hover:border-primary-500/40 hover:bg-white/[0.03]'
+              }`}
+            >
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-[1.25rem] bg-primary-500/15 text-primary-400">
+                <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
+              </div>
+
+              <h3 className="mb-1 text-lg font-bold text-white">{t('scan.dropTitle')}</h3>
+              <p className="text-sm text-slate-400">{t('scan.dropSubtitle')}</p>
             </div>
 
-            <h3 className="text-base sm:text-lg font-bold text-white mb-1">
-              Drag & Drop leaf photo here
-            </h3>
-            <p className="text-xs sm:text-sm text-slate-400 mb-4">
-              or click to browse from your device
-            </p>
-
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs font-medium text-slate-300 group-hover:bg-primary-500/20 group-hover:text-primary-300 transition-colors">
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-              </svg>
-              Browse Files
+            <div className="grid gap-2 sm:grid-cols-2">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex min-h-[52px] items-center justify-center gap-3 rounded-2xl border border-primary-500/30 bg-primary-500/10 px-4 py-3 text-sm font-semibold text-primary-200 transition-all hover:bg-primary-500/20 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-400"
+              >
+                <span className="text-2xl">📷</span>
+                {t('scan.takePhoto')}
+              </button>
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex min-h-[52px] items-center justify-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-white/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+              >
+                <span className="text-2xl">🖼</span>
+                {t('scan.uploadGallery')}
+              </button>
             </div>
 
-            <div className="mt-4 text-[11px] text-slate-500 font-mono">
-              Supported Formats: PNG, JPG, JPEG (Max Size: 5MB)
+            <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-3 text-sm text-slate-400">
+              <p>{t('scan.supportedFormats')}</p>
             </div>
           </div>
         ) : (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {/* Selected Image Preview Container */}
             <div className="relative aspect-video sm:aspect-[16/9] rounded-2xl border border-white/10 overflow-hidden bg-slate-900 group">
               <img
@@ -188,7 +198,7 @@ export function ImageUploadCard({
             </div>
 
             {/* Action Trigger Row */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-2">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
               <button
                 type="button"
                 onClick={onImageRemove}
@@ -206,27 +216,27 @@ export function ImageUploadCard({
                 onClick={onAnalyzeStart}
                 disabled={isAnalyzing}
                 isLoading={isAnalyzing}
-                className="w-full sm:w-auto px-8 shadow-glow font-semibold"
+                className="w-full px-6 py-3 text-base font-semibold shadow-glow sm:w-auto"
               >
-                {isAnalyzing ? 'Analyzing Cellular Features...' : 'Run AI Leaf Diagnosis'}
+                {isAnalyzing ? t('scan.analyzing') : 'Check Crop'}
               </Button>
             </div>
           </div>
         )}
 
         {/* Demo Preset Leaf Samples */}
-        <div className="pt-4 border-t border-white/5">
-          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">
+        <div className="border-t border-white/5 pt-3">
+          <div className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-400">
             Or try with sample leaf presets:
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
             {SAMPLE_PRESETS.map((preset) => (
               <button
                 key={preset.id}
                 type="button"
                 onClick={() => onImageSelect(preset.imageUrl, preset.id)}
-                className="p-2.5 rounded-2xl glass border border-white/10 hover:border-primary-500/40 text-left transition-all flex items-center gap-3 group focus:outline-none"
+                className="group flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 p-2 text-left transition-all hover:border-primary-500/40 focus:outline-none"
               >
                 <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0 border border-white/10">
                   <img src={preset.imageUrl} alt={preset.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform" />

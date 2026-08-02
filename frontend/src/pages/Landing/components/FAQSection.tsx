@@ -52,7 +52,7 @@ const FAQS = [
     question: 'Is CropGuard AI free for agricultural research and hackathon testing?',
     answer: (
       <p>
-        Yes, CropGuard AI is completely open for hackathon evaluation and agricultural research under Team <strong>TETRA039</strong> (Tetrathon 2026).
+        Yes, the tool is designed to be simple and practical for field use, with clear diagnosis and treatment guidance.
       </p>
     ),
   },

@@ -26,9 +26,7 @@ export function HeroSection() {
             {/* Hackathon Badge */}
             <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full glass border border-primary-500/30 text-xs sm:text-sm font-medium text-primary-300 shadow-glow">
               <span className="w-2 h-2 rounded-full bg-primary-400 animate-pulse" />
-              <span>Tetrathon 2026 · Team TETRA039</span>
-              <span className="text-white/30">•</span>
-              <span className="text-emerald-400 font-semibold">National AI Hackathon</span>
+              <span>Fast field support for farmers</span>
             </div>
 
             {/* Main Heading */}

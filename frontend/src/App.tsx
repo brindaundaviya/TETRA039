@@ -1,6 +1,6 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import { ThemeProvider } from '@/context';
+import { LanguageProvider, ThemeProvider } from '@/context';
 import { ErrorBoundary, Loading } from '@/components/common';
 import { ROUTES } from '@/utils/constants';
 
@@ -17,9 +17,6 @@ const DetectionPage = lazy(() =>
 const HistoryPage = lazy(() =>
   import('@/pages/History').then((m) => ({ default: m.HistoryPage }))
 );
-const AboutPage = lazy(() =>
-  import('@/pages/About').then((m) => ({ default: m.AboutPage }))
-);
 const NotFoundPage = lazy(() =>
   import('@/pages/NotFound').then((m) => ({ default: m.NotFoundPage }))
 );
@@ -27,6 +24,7 @@ const NotFoundPage = lazy(() =>
 export function App() {
   return (
     <ThemeProvider>
+      <LanguageProvider>
       <ErrorBoundary>
         <BrowserRouter>
           <Suspense fallback={<Loading fullScreen message="Loading CropGuard AI..." />}>
@@ -35,12 +33,12 @@ export function App() {
               <Route path={ROUTES.DASHBOARD} element={<DashboardPage />} />
               <Route path={ROUTES.DETECTION} element={<DetectionPage />} />
               <Route path={ROUTES.HISTORY} element={<HistoryPage />} />
-              <Route path={ROUTES.ABOUT} element={<AboutPage />} />
               <Route path="*" element={<NotFoundPage />} />
             </Routes>
           </Suspense>
         </BrowserRouter>
       </ErrorBoundary>
+      </LanguageProvider>
     </ThemeProvider>
   );
 }

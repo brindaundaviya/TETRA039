@@ -6,7 +6,6 @@ export const ROUTES = {
   DASHBOARD: '/dashboard',
   DETECTION: '/detection',
   HISTORY: '/history',
-  ABOUT: '/about',
 } as const;
 
 export const API_ENDPOINTS = {

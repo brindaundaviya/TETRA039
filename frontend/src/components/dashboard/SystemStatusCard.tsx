@@ -17,21 +17,21 @@ const SERVICES: ServiceStatus[] = [
     latency: '12ms',
   },
   {
-    name: 'Backend API Gateway',
+    name: 'Field Support Service',
     status: 'Connected',
     badgeBg: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400',
     dotColor: 'bg-emerald-400',
     latency: '45ms',
   },
   {
-    name: 'AI Neural Net Engine',
+    name: 'AI Detection System',
     status: 'Connected',
     badgeBg: 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400',
     dotColor: 'bg-emerald-400',
     latency: '180ms GPU',
   },
   {
-    name: 'Prediction Service',
+    name: 'Crop Analysis Service',
     status: 'Demo Mode',
     badgeBg: 'bg-accent-500/10 border-accent-500/30 text-accent-300',
     dotColor: 'bg-accent-400',
@@ -48,7 +48,7 @@ export function SystemStatusCard() {
             <svg className="w-5 h-5 text-accent-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
-            System Status
+            Farm Support Status
           </CardTitle>
 
           <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-mono border border-emerald-500/30 flex items-center gap-1.5">
@@ -56,7 +56,7 @@ export function SystemStatusCard() {
             ALL SYSTEMS NORMAL
           </span>
         </div>
-        <CardDescription>Real-time microservices & pipeline health</CardDescription>
+        <CardDescription>Daily field support tools and crop guidance readiness</CardDescription>
       </CardHeader>
 
       <CardContent className="p-6 space-y-3 flex-1 flex flex-col justify-around">

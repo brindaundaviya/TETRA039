@@ -5,3 +5,6 @@ export { RecentActivityTable } from './RecentActivityTable';
 export { QuickActionsCard } from './QuickActionsCard';
 export { TipsAndAgronomyCard } from './TipsAndAgronomyCard';
 export { SystemStatusCard } from './SystemStatusCard';
+export { TodayWeatherCard } from './TodayWeatherCard';
+export { TodayAdviceCard } from './TodayAdviceCard';
+export { HighPriorityAlertCard } from './HighPriorityAlertCard';
